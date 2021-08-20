@@ -15,5 +15,8 @@ test:
   before_script:
     - airflow db init
   script: 
+   - ls 
+   - pwd
+   - cp dags/* /opt/airflow/dags/
    - airflow dags list 
 
