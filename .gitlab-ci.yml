@@ -19,4 +19,5 @@ test:
    - pwd
    - cp dags/* /opt/airflow/dags/
    - airflow dags list 
+   - airflow dags test firsto 2021-08-18
 
