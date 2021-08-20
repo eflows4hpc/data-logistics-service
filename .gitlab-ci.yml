@@ -11,7 +11,7 @@ test:
   stage: test
   image: 
     name: apache/airflow:2.1.2
-    entrypoint: ["bash"]
+    entrypoint: [""]
   before_script:
     - airflow db init
   script: 
