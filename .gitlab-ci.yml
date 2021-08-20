@@ -1,0 +1,16 @@
+default:
+  image: python:3-slim
+
+stages:
+  - test
+  - build
+  - publish
+  - deploy
+
+test:
+  stage: test
+  image: apache/airflow:2.1.2
+  script: 
+   - airflow db init 
+   - airflow dags list 
+
