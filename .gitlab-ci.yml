@@ -10,7 +10,9 @@ stages:
 test:
   stage: test
   image: apache/airflow:2.1.2
+  entrypoint: ["bash"]
+  before_script:
+    - airflow db init
   script: 
-   - airflow db init 
    - airflow dags list 
 
