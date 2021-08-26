@@ -18,13 +18,13 @@ class B2ShareOperator(BaseOperator):
             **kwargs) -> None:
         super().__init__(**kwargs)
         self.name = name
-        #self.connection = Connection.get_connection_from_secrets(conn_id)
+        self.connection = Connection.get_connection_from_secrets(conn_id)
 
     def execute(self, context):
         message = "Hello {}".format(self.name)
         print(message)
 
-        #print(self.connection.host)
+        print(self.connection.uri)
 
         #print(f"Retrieving info from {self.connection.host}")
         lst = get_objects(server=server)
