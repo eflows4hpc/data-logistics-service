@@ -24,7 +24,7 @@ class B2ShareOperator(BaseOperator):
         message = "Hello {}".format(self.name)
         print(message)
 
-        print(self.connection.uri)
+        print(self.connection.get_uri())
 
         #print(f"Retrieving info from {self.connection.host}")
         lst = get_objects(server=server)
