@@ -1,9 +1,11 @@
 from airflow.models.baseoperator import BaseOperator
 from airflow.models.connection import Connection
+import requests
 
-        
+def get_objects(server):
+    lst = requests.get(urljoin(server, 'api/records')).json()
+    return lst['hits']['hits']
 
-from st import get_objects
 
 class B2ShareOperator(BaseOperator):
 

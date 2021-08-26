@@ -14,6 +14,7 @@ test:
     entrypoint: [""]
   before_script:
     - airflow db init
+    - pip install -r requirements.txt
   script: 
    - ls 
    - pwd
