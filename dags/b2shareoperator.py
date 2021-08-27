@@ -29,4 +29,5 @@ class B2ShareOperator(BaseOperator):
         #print(f"Retrieving info from {self.connection.host}")
         lst = get_objects(server=server)
         print(f"GOT: {lst}")
+        print(self.params)
         return message
