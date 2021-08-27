@@ -39,7 +39,7 @@ def taskflow_example():
         print(f"Total files downloaded: {len(files)}")
 
     data = extract(oid = 'b38609df2b334ea296ea1857e568dbea')
-    summary = transform(data)
-    load(summary["keys"])
+    files = transform(data)
+    load(files)
 
 dag = taskflow_example()
