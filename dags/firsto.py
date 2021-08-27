@@ -24,5 +24,5 @@ with DAG('firsto', default_args=def_args, description='first dag', schedule_inte
 
     t3 = B2ShareOperator(task_id='task_b2sh', dag=dag, name='B2Share')
 
-    t1 >> t2
+    t1 >> t2 >> t3
 
