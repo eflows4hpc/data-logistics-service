@@ -1,6 +1,33 @@
 default:
   image: python:3-slim
 
+# before script copied from gitlab docs
+before_script:
+  ##
+  ## Install ssh-agent if not already installed, it is required by Docker.
+  ## (change apt-get to yum if you use an RPM-based image)
+  ##
+  - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
+
+  ##
+  ## Run ssh-agent (inside the build environment)
+  ##
+  - eval $(ssh-agent -s)
+
+  ##
+  ## Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
+  ## We're using tr to fix line endings which makes ed25519 keys work
+  ## without extra base64 encoding.
+  ## https://gitlab.com/gitlab-examples/ssh-private-key/issues/1#note_48526556
+  ##
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+
+  ##
+  ## Create the SSH directory and give it the right permissions
+  ##
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+
 stages:
   - test
   - build
@@ -24,3 +51,23 @@ test:
    - airflow connections list
    - airflow dags test firsto 2021-08-18
 
+deploy-test:
+  stage: deploy
+  environment: Testing
+  only: 
+   - mptest && web
+  variables:
+    OS_AUTH_TYPE: v3applicationcredential
+    OS_AUTH_URL: https://hdf-cloud.fz-juelich.de:5000
+    OS_IDENTITY_API_VERSION: 3
+    OS_REGION_NAME: "HDFCloud"
+    OS_INTERFACE: public
+    FLOATING_IP: 134.94.199.39
+  script:
+    - echo "Starting the full testing deployment of airflows example."
+    # - sed -i 's_datacatalog.fz_zam10036.zam.kfa_g' deploy_scripts/cloudinit.yml
+    - pip install python-openstackclient
+    - INSTANCE_ID=`openstack server create -f value -c id --prefix IMAGE_ --flavor s2 --image 149a65b5-aeb8-499f-aaa6-ec966bd28dd6 --user-data cloudinit.yml --security-group ssh --security-group airflows --security-group www --security-group https testing-deployment`
+    - while [ "`openstack server show $INSTANCE_ID -c addresses -f value`" = "{}" ]; do sleep 5; done # wait until an address is available to attach the floating ip
+    - openstack server add floating ip $INSTANCE_ID $FLOATING_IP
+    - echo "Done"
