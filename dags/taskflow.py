@@ -30,7 +30,7 @@ def taskflow_example():
         name_mappings = {}
         for fname, url in flist.items():
             print(f"Processing: {fname} --> {url}")
-            tmpname = download_file(url=url, target_dir='/tmp/downs/')
+            tmpname = download_file(url=url, target_dir='/tmp/')
             name_mappings[fname]=tmpname
         return name_mappings
 

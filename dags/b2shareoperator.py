@@ -3,6 +3,7 @@ from airflow.models.connection import Connection
 import requests
 from urllib.parse import urljoin
 import tempfile
+import urllib
 
 def get_objects(server):
     lst = requests.get(urljoin(server, 'api/records')).json()
@@ -19,7 +20,8 @@ def get_object_md(server, oid):
     return obj
 
 def download_file(url: str, target_dir: str):
-    _, fname = tempfile.mkstemp(dir=target_dir)
+    
+    fname = tempfile.mkstemp(dir=target_dir)
     urllib.request.urlretrieve(url=url, filename=fname)
     return fname
 
