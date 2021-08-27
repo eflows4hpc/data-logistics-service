@@ -55,7 +55,7 @@ deploy-test:
   stage: deploy
   environment: Testing
   only: 
-   - mptest && web
+   - mptest
   variables:
     OS_AUTH_TYPE: v3applicationcredential
     OS_AUTH_URL: https://hdf-cloud.fz-juelich.de:5000
