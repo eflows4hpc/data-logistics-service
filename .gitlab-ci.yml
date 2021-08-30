@@ -2,13 +2,14 @@ default:
   image: python:3-slim
 
 stages:
-  # - test
+  - test
   - build
   - publish
   - deploy
 
 test:
   stage: test
+  when: manual
   image: 
     name: apache/airflow:2.1.2
     entrypoint: [""]
