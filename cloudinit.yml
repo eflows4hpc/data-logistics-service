@@ -48,8 +48,8 @@ users:
 
 runcmd:
   - mkdir -p /app/mnt/data
-  - 'git clone https://github.com/btphan95/greenr-airflow /home/airflow'
-  - cd /home/airflow/greenr-airflow
+  - 'git clone https://github.com/btphan95/greenr-airflow /home/maria/airflow'
+  - cd /home/maria/airflow
   # general startup takes long enough that no delay should bee needed - 5 to 6 minutes until these commands are executed
   - bash <(curl -s https://get.docker.com/)
   - bash scripts/nginx-airflow.sh
