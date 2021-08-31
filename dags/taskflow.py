@@ -3,6 +3,8 @@ from airflow.decorators import dag, task
 from airflow.utils.dates import days_ago
 from airflow.models.connection import Connection
 from airflow.models.dagrun import DagRun
+from airflow.providers.ssh.hooks.ssh import SSHHook
+
 import requests
 import urllib.request
 import tempfile
@@ -47,10 +49,17 @@ def taskflow_example(**kwargs):
     @task()
     def load(files: dict):
         print(f"Total files downloaded: {len(files)}")
+        ssh_hook = SSHHook(ssh_conn_id='default_ssh')
+        with ssh_hook.get_conn() as ssh_client:
+            sftp_client = ssh_client.open_sftp()
+            for [local, remote] in files.items():
+                sftp_client.put(local, f"/tmp/{remote}")
 
-    
+
+
     data = extract()
     files = transform(data)
     load(files)
     
 dag = taskflow_example()
+
