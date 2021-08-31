@@ -21,7 +21,7 @@ def get_object_md(server, oid):
 
 def download_file(url: str, target_dir: str):
     
-    fname = tempfile.mkstemp(dir=target_dir)
+    fname = tempfile.mktemp(dir=target_dir)
     urllib.request.urlretrieve(url=url, filename=fname)
     return fname
 
