@@ -9,7 +9,7 @@ TEST_DAG_ID = 'test_my_custom_operator'
 
 class B2ShareOperatorTest(unittest.TestCase):
    def setUp(self):
-       self.dag = DAG(TEST_DAG_ID, schedule_interval='@daily', default_args={'start_date' : DEFAULT_DATE})
+       self.dag = DAG(TEST_DAG_ID, schedule_interval='@daily',name='testing_dag', default_args={'start_date' : DEFAULT_DATE})
        self.op = B2ShareOperator(
            dag=self.dag,
            task_id='test',
