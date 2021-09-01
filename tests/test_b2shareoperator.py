@@ -19,7 +19,7 @@ class B2ShareOperatorTest(unittest.TestCase):
        self.ti = TaskInstance(task=self.op, execution_date=days_ago(1))
 
    def test_execute_no_trigger(self):
-       self.ti.run(ignore_ti_state=True)
+       self.ti.run(ignore_ti_state=False)
        print(self.ti.state)
        self.assertEqual(State.SUCCESS, self.ti.state)
        # Assert something related to tasks results
