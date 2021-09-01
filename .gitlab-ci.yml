@@ -15,6 +15,7 @@ test:
   before_script:
     - airflow db init
     - pip install -r requirements.txt
+    - pip install nose==1.3.7
     - airflow connections add --conn-uri https://b2share-testing.fz-juelich.de/ default_b2share
   script: 
    - ls 
@@ -23,4 +24,5 @@ test:
    - airflow dags list 
    - airflow connections list
    - airflow dags test firsto 2021-08-18
+   - nosetests
 
