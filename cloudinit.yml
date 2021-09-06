@@ -51,7 +51,6 @@ runcmd:
   - 'git clone https://github.com/btphan95/greenr-airflow /home/maria/airflow'
   - cd /home/maria/airflow
   # general startup takes long enough that no delay should bee needed - 5 to 6 minutes until these commands are executed
-  - bash <(curl -s https://get.docker.com/)
   - bash scripts/nginx-airflow.sh
   - sudo docker build -t greenr-airflow:latest .
   - sudo docker run -d -p 8080:8080 -p 8008:8008 greenr-airflow
