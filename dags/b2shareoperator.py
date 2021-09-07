@@ -20,33 +20,51 @@ def get_object_md(server, oid):
     return obj
 
 def download_file(url: str, target_dir: str):
-    
     fname = tempfile.mktemp(dir=target_dir)
     urllib.request.urlretrieve(url=url, filename=fname)
     return fname
 
 
-server='https://b2share-testing.fz-juelich.de/'
 
 class B2ShareOperator(BaseOperator):
+    template_fields = ('target_dir',)
 
     def __init__(
             self,
             name: str,
-            conn_id: str = 'default_b2share',
+            conn_id: str = 'default_b2share', # 'https://b2share-testing.fz-juelich.de/',
+            target_dir: str = '/tmp/', 
             **kwargs) -> None:
         super().__init__(**kwargs)
         self.name = name
         self.conn_id = conn_id
+        self.target_dir = target_dir
+        print(self.target_dir)
+
+    def execute(self, **kwargs):
+        connection = Connection.get_connection_from_secrets('default_b2share')
+        server = connection.get_uri()
+        print(f"Rereiving data from {server}")
+
+        print('Kwargs')
         print(kwargs)
 
-    def execute(self, context):
+        params = kwargs['context']['params']
+        oid = params['oid']
+        obj = get_object_md(server=server, oid=oid)
+        print(f"Retrieved object {oid}: {obj}")
+        flist = get_file_list(obj)
 
-        connection = Connection.get_connection_from_secrets(self.conn_id)
-        print(f"Rereiving data from {connection.get_uri()}")
+        ti = kwargs['context']['ti']
+        name_mappings = {}
+        for fname, url in flist.items():
+            tmpname = download_file(url=url, target_dir=self.target_dir)
+            print(f"Processing: {fname} --> {url} --> {tmpname}")
 
-        lst = get_objects(server=connection.get_uri())
-        flist = {o['id']: [f['key'] for f in o['files']] for o in lst}
-        print(f"GOT: {flist}")
-        print(self.params)
-        return len(flist)
+            name_mappings[fname]=tmpname
+            ti.xcom_push(key='local', value=tmpname)
+            ti.xcom_push(key='remote', value=fname)
+            break # for now only one file
+
+        
+        return len(name_mappings)
