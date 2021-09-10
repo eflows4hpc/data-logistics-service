@@ -23,7 +23,7 @@ def taskflow_example(**kwargs):
         print(f"Rereiving data from {server}")
 
         params = kwargs['params']
-        if 'oid' not in params:
+        if 'oid' not in params: #{"oid":"b38609df2b334ea296ea1857e568dbea"}
             print(f"Missing object id in pipeline parameters")
             lst = get_objects(server=server)
             flist = {o['id']: [f['key'] for f in o['files']] for o in lst}
@@ -52,8 +52,8 @@ def taskflow_example(**kwargs):
         ssh_hook = SSHHook(ssh_conn_id='default_ssh')
         with ssh_hook.get_conn() as ssh_client:
             sftp_client = ssh_client.open_sftp()
-            for [local, remote] in files.items():
-                sftp_client.put(local, f"/tmp/{remote}")
+            for [truename, local] in files.items():
+                sftp_client.put(local, f"/tmp/{truename}")
 
 
 

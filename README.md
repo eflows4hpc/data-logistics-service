@@ -17,7 +17,19 @@ docker-compose -f dockers/docker-compose.yaml --project-directory . up -d
 ```
 
 ## Setup connection
+
+### B2Share connection 
+Here we use testing instance (check hostname)
+
 ```
-curl -X POST -u creds -H "Content-Type: application/json"  --data '{"connection_id": "default_b2share","conn_type":"https", "host": "b2share-testing.fz-juelich.de", "schema":""}' localhost:7001/api/v1/connections
+curl -X POST -u creds -H "Content-Type: application/json"  --data '{"connection_id": "default_b2share","conn_type":"https", "host": "b2share-testing.fz-juelich.de", "schema":""}' airflow:7001/api/v1/connections
 ```
+
+### SSH 
+Copy to target goes through scp (example with username/pass)
+
+```
+curl -X POST -u creds -H "Content-Type: application/json"  --data '{"connection_id": "default_ssh", "conn_type": "ssh", "host": "ssh", "login": "user", "port": 2222, "password": "pass"}' airflow:7001/api/v1/connections
+```
+
 

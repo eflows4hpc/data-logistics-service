@@ -10,4 +10,4 @@ class TestADag(unittest.TestCase):
        dag = self.dagbag.get_dag(dag_id='firsto')
        assert self.dagbag.import_errors == {}
        assert dag is not None
-       self.assertEqual(len(dag.tasks), 3, f"Actually: {len(dag.tasks)}")
+       self.assertEqual(len(dag.tasks), 2, f"Actually: {len(dag.tasks)}")
