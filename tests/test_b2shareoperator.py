@@ -4,7 +4,6 @@ from airflow.utils.dates import days_ago
 from dags.b2shareoperator import B2ShareOperator
 from airflow import DAG
 from airflow.models.taskinstance import TaskInstance
-from tests.test_utils.config import conf_vars
 
 
 DEFAULT_DATE = '2019-10-03'
