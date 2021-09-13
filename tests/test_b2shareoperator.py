@@ -20,7 +20,7 @@ class B2ShareOperatorTest(unittest.TestCase):
 
    def test_execute_no_trigger(self):
        
-       self.ti.run(ignore_ti_state=False)
+       self.ti.run(ignore_ti_state=False, context={'params': {'oid': 111}})
        print(self.ti.state)
        self.assertEqual(State.SUCCESS, self.ti.state)
        # Assert something related to tasks results

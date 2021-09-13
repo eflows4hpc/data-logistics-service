@@ -44,7 +44,7 @@ class B2ShareOperator(BaseOperator):
 
     def execute(self, **kwargs):
         hook = HttpHook(http_conn_id=self.conn_id, method='GET')
-
+        print(kwargs)
         params = kwargs['context']['params']
         oid = params['oid']
         hrespo = hook.run(endpoint=f"/api/records/{oid}")
