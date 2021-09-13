@@ -40,18 +40,17 @@ class B2ShareOperator(BaseOperator):
         self.name = name
         self.conn_id = conn_id
         self.target_dir = target_dir
-        print(self.target_dir)
-
+        
     def execute(self, **kwargs):
         hook = HttpHook(http_conn_id=self.conn_id, method='GET')
-        print(kwargs)
         params = kwargs['context']['params']
         oid = params['oid']
+        
         hrespo = hook.run(endpoint=f"/api/records/{oid}")
         print(hrespo)
 
         flist = get_file_list(hrespo.json())
-        print(flist)
+        
         ti = kwargs['context']['ti']
         name_mappings = {}
         for fname, url in flist.items():
