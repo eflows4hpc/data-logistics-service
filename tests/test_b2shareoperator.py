@@ -31,7 +31,7 @@ class B2ShareOperatorTest(unittest.TestCase):
         gfl.return_value = {'ooo.txt': 'htt://file/to/download'}
         down.return_value = 'tmp_name'
 
-        self.ti.run(ignore_ti_state=True)
+        self.ti.run(ignore_ti_state=True, test_mode=True)
         print(self.ti.state)
         self.assertEqual(State.SUCCESS, self.ti.state)
         # Assert something related to tasks results
