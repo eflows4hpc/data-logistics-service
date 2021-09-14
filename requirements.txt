@@ -1,3 +1,5 @@
 requests
 urllib3==1.26.6
 apache-airflow-providers-ssh
+apache-airflow-providers-http
+apache-airflow-providers-sftp

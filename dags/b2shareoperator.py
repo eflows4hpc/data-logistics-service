@@ -1,5 +1,6 @@
 from airflow.models.baseoperator import BaseOperator
 from airflow.models.connection import Connection
+from airflow.providers.http.hooks.http import HttpHook
 import requests
 from urllib.parse import urljoin
 import tempfile
@@ -39,22 +40,17 @@ class B2ShareOperator(BaseOperator):
         self.name = name
         self.conn_id = conn_id
         self.target_dir = target_dir
-        print(self.target_dir)
-
+        
     def execute(self, **kwargs):
-        connection = Connection.get_connection_from_secrets('default_b2share')
-        server = connection.get_uri()
-        print(f"Rereiving data from {server}")
-
-        print('Kwargs')
-        print(kwargs)
-
+        hook = HttpHook(http_conn_id=self.conn_id, method='GET')
         params = kwargs['context']['params']
         oid = params['oid']
-        obj = get_object_md(server=server, oid=oid)
-        print(f"Retrieved object {oid}: {obj}")
-        flist = get_file_list(obj)
+        
+        hrespo = hook.run(endpoint=f"/api/records/{oid}")
+        print(hrespo)
 
+        flist = get_file_list(hrespo.json())
+        
         ti = kwargs['context']['ti']
         name_mappings = {}
         for fname, url in flist.items():
@@ -66,5 +62,5 @@ class B2ShareOperator(BaseOperator):
             ti.xcom_push(key='remote', value=fname)
             break # for now only one file
 
-        
+        ti.xcom_push(key='mappins', value=name_mappings)
         return len(name_mappings)
