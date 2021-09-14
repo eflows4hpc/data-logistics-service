@@ -52,7 +52,7 @@ runcmd:
   - mkdir airflow-testing
   - cd airflow-testing
   - mkdir ./logs ./plugins
-  - cp -r ../data-logistics-servicedockers/dags .
+  - cp -r ../data-logistics-service/dags/ .
   - echo -e "AIRFLOW_UID=$(id -u)\nAIRFLOW_GID=0" > .env
-  - docker-compose -f ../data-logistics-servicedockers/docker-compose.yaml --project-directory . up airflow-init
-  - docker-compose -f ../data-logistics-servicedockers/docker-compose.yaml --project-directory . up -d
+  - sudo docker-compose -f ../data-logistics-service/dockers/docker-compose.yaml --project-directory . up airflow-init
+  - sudo docker-compose -f ../data-logistics-service/dockers/docker-compose.yaml --project-directory . up -d
