@@ -62,5 +62,5 @@ class B2ShareOperator(BaseOperator):
             ti.xcom_push(key='remote', value=fname)
             break # for now only one file
 
-        ti.xcom_push(key='mappins', value=name_mappings)
+        ti.xcom_push(key='mappings', value=name_mappings)
         return len(name_mappings)

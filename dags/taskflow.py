@@ -28,7 +28,7 @@ def taskflow_example(**kwargs):
             lst = get_objects(server=server)
             flist = {o['id']: [f['key'] for f in o['files']] for o in lst}
             print(f"Objects on server: {flist}")
-            return {} 
+            return -1 # non zero exit code is a task failure 
         else:
             oid = params['oid']
 

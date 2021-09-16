@@ -32,4 +32,8 @@ Copy to target goes through scp (example with username/pass)
 curl -X POST -u creds -H "Content-Type: application/json"  --data '{"connection_id": "default_ssh", "conn_type": "ssh", "host": "ssh", "login": "user", "port": 2222, "password": "pass"}' airflow:7001/api/v1/connections
 ```
 
+Connections can also be added through env variables, like
 
+```
+AIRFLOW_CONN_MY_PROD_DATABASE=my-conn-type://login:password@host:port/schema?param1=val1&param2=val2
+```
