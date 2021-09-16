@@ -23,6 +23,6 @@ test:
    - cp dags/* /opt/airflow/dags/
    - airflow dags list 
    - airflow connections list
-   - airflow dags test firsto 2021-08-18
+   - airflow dags test testdag 2021-08-18
    - nosetests
 
