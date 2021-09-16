@@ -14,7 +14,7 @@ def_args = {
 
 }
 
-with DAG('firsto', default_args=def_args, description='first dag', schedule_interval=timedelta(days=1), start_date=days_ago(2)) as dag:
+with DAG('testdag', default_args=def_args, description='simple testing dag', schedule_interval=timedelta(days=1), start_date=days_ago(2)) as dag:
     t1 = BashOperator(task_id='print_date', bash_command='date')
     t2 = BashOperator(task_id='do_noting', bash_command='sleep 5')
 
