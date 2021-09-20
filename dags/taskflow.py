@@ -1,21 +1,19 @@
 
 from airflow.decorators import dag, task
-from airflow.utils.dates import days_ago
 from airflow.models.connection import Connection
-from airflow.models.dagrun import DagRun
 from airflow.providers.ssh.hooks.ssh import SSHHook
+from airflow.utils.dates import days_ago
 
-import requests
-import urllib.request
-import tempfile
-from b2shareoperator import get_file_list, download_file, get_object_md, get_objects
+from b2shareoperator import (download_file, get_file_list, get_object_md,
+                             get_objects)
 
 default_args = {
     'owner': 'airflow',
 }
 
+
 @dag(default_args=default_args, schedule_interval=None, start_date=days_ago(2), tags=['example'])
-def taskflow_example(**kwargs):
+def taskflow_example():
     @task(multiple_outputs=True)
     def extract(**kwargs):
         connection = Connection.get_connection_from_secrets('default_b2share')
@@ -23,14 +21,14 @@ def taskflow_example(**kwargs):
         print(f"Rereiving data from {server}")
 
         params = kwargs['params']
-        if 'oid' not in params: #{"oid":"b38609df2b334ea296ea1857e568dbea"}
-            print(f"Missing object id in pipeline parameters")
+        if 'oid' not in params:  # {"oid":"b38609df2b334ea296ea1857e568dbea"}
+            print("Missing object id in pipeline parameters")
             lst = get_objects(server=server)
             flist = {o['id']: [f['key'] for f in o['files']] for o in lst}
             print(f"Objects on server: {flist}")
-            return {} 
-        else:
-            oid = params['oid']
+            return -1  # non zero exit code is a task failure
+
+        oid = params['oid']
 
         obj = get_object_md(server=server, oid=oid)
         print(f"Retrieved object {oid}: {obj}")
@@ -43,7 +41,7 @@ def taskflow_example(**kwargs):
         for fname, url in flist.items():
             print(f"Processing: {fname} --> {url}")
             tmpname = download_file(url=url, target_dir='/tmp/')
-            name_mappings[fname]=tmpname
+            name_mappings[fname] = tmpname
         return name_mappings
 
     @task()
@@ -55,11 +53,9 @@ def taskflow_example(**kwargs):
             for [truename, local] in files.items():
                 sftp_client.put(local, f"/tmp/{truename}")
 
-
-
     data = extract()
     files = transform(data)
     load(files)
-    
-dag = taskflow_example()
 
+
+dag = taskflow_example()
