@@ -1,0 +1,47 @@
+== Requests documentation for YORCA integration
+
+This document provides a list and structure of request to start a data transfer with DLS. The minimal workflow currently defined in the project assumes that
+the DLS part will be about moving data from a EUDAT service (B2SHARE) into a HPC through +ssh+.
+
+=== Prerequisites ===
+Host address with api e.g., +export DLS=http://HOST:PORT/api/v1/+
+
+Also credentials +USER:PASS+ (which are sent as http authentication).
+
+A full description of the airflow API can be found in https://airflow.apache.org/docs/apache-airflow/stable/stable-rest-api-ref.html[Documentation].
+
+A connection to B2SHARE instance needs to be set-up. This can be done either in manual fashion or with following request (please note that we use testing instance of B2SHARE):
+
+----
+curl -X POST -u USER:PASS -H "Content-Type: application/json" \
+   --data '{"connection_id": "default_b2share","conn_type":"https", "host": "/b2share-testing.fz-juelich.de", "schema":"https"}' \
+   $DLS/connections
+----
+
+There should be an object created in B2SHARE, each object in B2SHARE is identified by a +id+, which needs to be passed to the DLS workflow as a parameter (see below).
+
+Also a connection to the SSH target needs to be created (where the data will be copied to):
+
+----
+curl -X POST -u USER:PASS -H "Content-Type: application/json"  \
+   --data '{"connection_id": "default_ssh", "conn_type": "ssh", "host": "SSH_HOST","login": "LOGIN", "port": PORT, "password": "PASSWORD"}' \
+   $DLS/connections
+----
+
+=== Starting data transfer ===
+To start a transfer following request needs to be sent it includes B2SHARE object id as a parameter. For testing purposes one can use +b38609df2b334ea296ea1857e568dbea+ which
+includes one 100MB file.
+
+----
+curl -X POST -u USER:PASS -H "Content-Type: application/json" \
+   --data '{"conf": {"oid":ID}}' \
+   $DLS/dags/taskflow_example/dagRuns
+----
+
+=== Checking status ===
+----
+curl -X GET -u USER:PASS -H "Content-Type: application/json" $DLS/dags/taskflow_example/dagRuns
+----
+
+=== Comments ===
+I could image that a name of DLS pipeline (+taskflow_example+) can change and needs to be passed as parameter to YORC.
