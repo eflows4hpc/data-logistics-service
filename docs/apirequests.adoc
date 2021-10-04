@@ -1,4 +1,3 @@
-
 == Requests documentation for YORCA integration
 
 This document provides a list and structure of request to start a data transfer with DLS. The minimal workflow currently defined in the project assumes that
@@ -37,6 +36,11 @@ includes one 100MB file.
 curl -X POST -u USER:PASS -H "Content-Type: application/json" \
    --data '{"conf": {"oid":ID}}' \
    $DLS/dags/taskflow_example/dagRuns
+----
+
+=== Checking status ===
+----
+curl -X GET -u USER:PASS -H "Content-Type: application/json" $DLS/dags/taskflow_example/dagRuns
 ----
 
 === Comments ===
