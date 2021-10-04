@@ -3,6 +3,7 @@ from airflow.decorators import dag, task
 from airflow.models.connection import Connection
 from airflow.providers.ssh.hooks.ssh import SSHHook
 from airflow.utils.dates import days_ago
+import os
 
 from b2shareoperator import (download_file, get_file_list, get_object_md,
                              get_objects)
@@ -45,13 +46,20 @@ def taskflow_example():
         return name_mappings
 
     @task()
-    def load(files: dict):
+    def load(files: dict, **kwargs):
         print(f"Total files downloaded: {len(files)}")
+        params = kwargs['params']
+        if 'target' not in params:
+            target = '/tmp/'
+            print(f"Using default target {target}")
+        else:
+            target = params['target']
+
         ssh_hook = SSHHook(ssh_conn_id='default_ssh')
         with ssh_hook.get_conn() as ssh_client:
             sftp_client = ssh_client.open_sftp()
             for [truename, local] in files.items():
-                sftp_client.put(local, f"/tmp/{truename}")
+                sftp_client.put(local, os.path.join(target, truename))
 
     data = extract()
     files = transform(data)
