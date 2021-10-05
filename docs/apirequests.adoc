@@ -28,13 +28,19 @@ curl -X POST -u USER:PASS -H "Content-Type: application/json"  \
    $DLS/connections
 ----
 
+or for key-based access:
+----
+curl -X POST -u USER:PASS -H "Content-Type: application/json" --data '{"connection_id": "default_ssh", "conn_type": "ssh", "host": "SSH_HOST", "login": "LOGIN", "port": PORT, "extra": "{\"private_key\": \"-----BEGIN OPENSSH PRIVATE KEY-----\\nb3BlbnNzaC1rZXktdjgEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAlwAAAAdzc2gtcn\\nNhAAAAAwEAAQAAAIEAv1w/pNTlbh8Kvmu3+NMt5Kp7yT2FxplbPHi7sQEG80tPNNLb1oDa\\n1JaqKIN1Jq+U1895TTRr1nZBz6rKubssjdQ5H3AcO5ZbNRfiE4tGYbqHPAmpi4kTumQpy5\\nf0JkCHBNuK2LAEOV6pg1jukSmI34Z/HSoBpCCqmDPTQdT9Xq0AAAIIJKwpKCSsKSgAAAAH\\nc3NoLXJzYQAAAIEAv1w/pNTlbh8Kvmu3+NMt5Kp7yT2FxplbPHi7sQEG80tPNNLb1oDa1J\\naqKIN1Jq+U1895TTRr1nZBz6rKubssjdQ5H3AcO5ZbNRfiE4tGYbqHPAmpi4kTumQpy5f0\\nJkCHBNuK2LAEOV6pg1jukSmI34Z/HSoBpCCqmDPTQdT9Xq0AAAADAQABAAAAgEAFdu2IpL\\nGxBQEsPMKstH/6Yau0P5twF0wmAHV5qH+hRIChwxcCyTOyrH8dbAZjW+LP8P9ZeHKp4d6+\\nf1CgRIkhrKj2IYqXgIRUnbH3POBPzmxcEXSYrzc9zOriMhEEdsUraR0C20eFxShyVRHQRv\\nYjnvbYdcZjVnP09TLndZRpAAAAQAXtoENeyFzGxTpNlwqoggeeSvvXTIq8EiLFT8tdF2Lc\\nCXv/6VSDo53f3NmnC45sCNX3/vUq8Hqdu4SHm4y1EGEAAABBAPpNPhi2OvnN6wCiuRMbx1\\nD/nXdtI9LnPwwUmYcKZ+TDIx3mqpyZEJogIKA6gUlG1h1L1VUrtkr/e5XJGLP33ksAAABB\\nAMO3fvQIbOcNiVwKPu1nQG6KrS7y0Uf1O8sb+5kQMGBkJVcyLJTr3fYafOd7Sxo66OYv0b\\nQ649nEtohPPD75u+cAAAARcm9vdEBiY2JiZjhhZDdhMjQBAg==\\n-----END OPENSSH PRIVATE KEY-----\"}"}' \
+ $DLS/connections
+----
+
 === Starting data transfer ===
 To start a transfer following request needs to be sent it includes B2SHARE object id as a parameter. For testing purposes one can use +b38609df2b334ea296ea1857e568dbea+ which
-includes one 100MB file.
+includes one 100MB file. The target parameter is optional with default value +/tmp/+.
 
 ----
 curl -X POST -u USER:PASS -H "Content-Type: application/json" \
-   --data '{"conf": {"oid":ID}}' \
+   --data '{"conf": {"oid": ID}, "target": PATH}' \
    $DLS/dags/taskflow_example/dagRuns
 ----
 
