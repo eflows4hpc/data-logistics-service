@@ -56,6 +56,6 @@ runcmd:
   - cp -r ../data-logistics-service/plugins/* ./plugins
   - cp ../data-logistics-service/config/* ./config
   - echo "AIRFLOW_UID=0\nAIRFLOW_GID=0" > ../data-logistics-service/dockers/.env #for root
-  - docker-compose -f ../data-logistics-service/dockers/docker-compose.yaml --project-directory . up airflow-init
+  - docker-compose -f ../data-logistics-service/dockers/docker-compose.yaml --project-directory . --verbose up airflow-init
   - docker-compose -f ../data-logistics-service/dockers/docker-compose.yaml --project-directory . up
   # - /bin/bash ../data-logistics-service/scripts/deployment.sh .
