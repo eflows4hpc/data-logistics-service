@@ -1,8 +1,7 @@
 from airflow.plugins_manager import AirflowPlugin
-from flask_admin.base import MenuLink
 
 appbuilder_eFlows = {
-    "name": "More about eFlows4HPC",
+    "name": "About eFlows4HPC",
     "href": "https://eflows4hpc.eu/",
 }
 
