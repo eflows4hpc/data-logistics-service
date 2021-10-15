@@ -4,10 +4,6 @@ default:
 # before script copied from gitlab docs
 before_script:
   - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client gcc libxslt-dev libffi-dev libssl-dev build-essential python3-dev -y )'
-  - eval $(ssh-agent -s)
-  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-  - mkdir -p ~/.ssh
-  - chmod 700 ~/.ssh
 
 stages:
   - test
