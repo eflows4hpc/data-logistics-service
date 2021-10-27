@@ -1,0 +1,38 @@
+{% extends 'airflow/main.html' %}
+ 
+<!--{% block body %}    
+   <p>
+    <a href="/path/to/target.html">
+        <img src="https://eflows4hpc.eu/wp-content/uploads/2021/01/logo-1.png" alt="eFlows4HPC Logo" title="The title of this image"/>
+    </a>
+   </p>
+   {{ super() }}
+{% endblock %}-->
+{% block footer %}
+  {% if not current_user.is_anonymous %}
+    {% set version_label = 'Version' %}
+    <footer class="footer">
+      <div class="container">
+        <div>
+          {{ version_label }}: {% if airflow_version %}<a href="https://pypi.python.org/pypi/apache-airflow/{{ airflow_version }}" target="_blank">v{{ airflow_version }}</a>{% else %} N/A{% endif %}
+         <div class="jumbotron text-center" style="margin-bottom:0">
+            <p>
+               <a href="https://www.eFlows4HPC.eu">
+                  <img src="https://eflows4hpc.eu/wp-content/uploads/2021/01/logo-1.png" alt="eFlows4HPC Logo" title="The title of this image"/>
+               </a>
+            </p>
+<!--             <p>This is the Data Catalog for the <a href="https://www.eFlows4HPC.eu">eFlows4HPC</a> project</p> -->
+            <p>This work has been supported by the eFlows4HPC project, contract #955558. This project has received funding from the European High-Performance Computing Joint Undertaking (JU) under grant agreement No 955558.<br>The JU receives support from the European Union’s Horizon 2020 research and innovation programme and Spain, Germany, France, Italy, Poland, Switzerland, Norway.</p>
+            <hr>
+            <p>The source code for the Data Catalog is available on <a href="https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service/">gitlab</a>.</p>
+            <p>If there are any technical problems with this site, please create an issue on <a href="https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service/-/issues">gitlab</a>.</p>
+            <hr>
+            <p><a href="https://www.fz-juelich.de/portal/EN/Service/LegalNotice/_node.html">Impressum</a></p>
+        </div>
+
+        </div>
+        <div></div>
+      </div>
+    </footer>
+  {% endif %}
+{% endblock %}
