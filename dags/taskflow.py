@@ -50,12 +50,13 @@ def taskflow_example():
         print(f"Total files downloaded: {len(files)}")
         params = kwargs['params']
         target = params.get('target', '/tmp/')
+        connection_id = params.get('connection', 'default_ssh')
         
-        ssh_hook = SSHHook(ssh_conn_id='default_ssh')
+        ssh_hook = SSHHook(ssh_conn_id=connection_id)
         with ssh_hook.get_conn() as ssh_client:
             sftp_client = ssh_client.open_sftp()
             for [truename, local] in files.items():
-                print(f"Copying {local} --> {os.path.join(target, truename)}")
+                print(f"Copying {local} --> {connection_id}:{os.path.join(target, truename)}")
                 sftp_client.put(local, os.path.join(target, truename))
 
     data = extract()
