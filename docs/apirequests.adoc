@@ -20,7 +20,7 @@ curl -X POST -u USER:PASS -H "Content-Type: application/json" \
 
 There should be an object created in B2SHARE, each object in B2SHARE is identified by a +id+, which needs to be passed to the DLS workflow as a parameter (see below).
 
-Also a connection to the SSH target needs to be created (where the data will be copied to):
+Also a connection to the SSH target needs to be created (where the data will be copied to). You are free to use own conneciton name here, and pass it over to during the execution (defult is 'default_ssh')
 
 ----
 curl -X POST -u USER:PASS -H "Content-Type: application/json"  \
@@ -43,6 +43,15 @@ curl -X POST -u USER:PASS -H "Content-Type: application/json" \
    --data '{"conf": {"oid": ID}, "target": PATH}' \
    $DLS/dags/taskflow_example/dagRuns
 ----
+
+If you want to use your own connection ('myown_con'):
+----
+curl -X POST -u USER:PASS -H "Content-Type: application/json" \
+   --data '{"conf": {"oid": ID}, "target": PATH, "connection": "myown_con"}' \
+   $DLS/dags/taskflow_example/dagRuns
+----
+
+
 
 === Checking status ===
 ----
