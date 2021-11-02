@@ -1,3 +1,5 @@
+import json
+import os
 import tempfile
 import urllib
 from urllib.parse import urljoin
@@ -28,6 +30,37 @@ def download_file(url: str, target_dir: str):
     fname = tempfile.mktemp(dir=target_dir)
     urllib.request.urlretrieve(url=url, filename=fname)
     return fname
+
+def get_record_template():
+    return {"titles":[{"title":"DLS dataset record"}],
+            "creators":[{"creator_name": "eflows4HPC"}],
+            "descriptions":
+              [{"description": "Output of eflows4HPC DLS", "description_type": "Abstract"}],
+            "community": "a9217684-945b-4436-8632-cac271f894ed",
+            'community_specific':
+               {'91ae5d2a-3848-4693-9f7d-cbd141172ef0': {'helmholtz centre': ['Forschungszentrum Jülich']}},
+            "open_access": True}
+
+def create_draft_record(server: str, token: str, record):
+    response = requests.post( url=urljoin(server, 'api/records/'),
+                      headers={'Content-Type':'application/json'},
+                      data=json.dumps(record), params={'access_token': token})
+    return response.json()
+
+# the simplest version, target should be chunked
+def add_file(record, fname: str, token: str):
+    jf = os.path.split(fname)[-1]
+    return requests.put(url=f"{record['links']['files']}/{jf}",
+                         params={'access_token': token},
+                         headers={"Content-Type":"application/octet-stream"},
+                         data=open(fname, 'rb'))
+
+def submit_draft(record, token):
+    pub = [{"op": "add", "path":"/publication_state", "value": "submitted"}]
+    response = requests.patch(record['links']['self'],
+                       headers={"Content-Type":"application/json-patch+json"},
+                       data=json.dumps(pub), params={'access_token': token})
+    return response.json()
 
 
 class B2ShareOperator(BaseOperator):

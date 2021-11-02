@@ -1,5 +1,7 @@
 import unittest
 from unittest.mock import Mock, patch
+import tempfile
+import os
 
 from airflow import DAG
 from airflow.models.taskinstance import TaskInstance
@@ -7,7 +9,8 @@ from airflow.utils.dates import days_ago
 from airflow.utils.state import State
 
 from dags.b2shareoperator import (B2ShareOperator, download_file,
-                                  get_file_list, get_object_md, get_objects)
+                                  get_file_list, get_object_md, get_objects,
+                                  get_record_template, create_draft_record, add_file, submit_draft)
 
 DEFAULT_DATE = '2019-10-03'
 TEST_DAG_ID = 'test_my_custom_operator'
@@ -83,3 +86,22 @@ class B2ShareOperatorTest(unittest.TestCase):
             get.return_value = m
             r = get_objects(server='foo')
             self.assertListEqual(['a', 'b'], r)
+
+    def test_upload(self):
+        template = get_record_template()
+        server='https://b2share-testing.fz-juelich.de/'
+        token = ''
+        with patch('dags.b2shareoperator.requests.post') as post: 
+            r = create_draft_record(server=server, token=token, record=template)
+
+        r = dict()
+        r['links']={'files':server, 'self': server}
+        with patch('dags.b2shareoperator.requests.post') as put:
+            a = tempfile.NamedTemporaryFile()
+            a.write(b"some content")
+            up = add_file(record=r, fname=a.name, token=token)
+
+
+        with patch('dags.b2shareoperator.requests.patch') as p:
+            submitted = submit_draft(record=r, token=token)
+
