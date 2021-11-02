@@ -58,6 +58,8 @@ def taskflow_example():
             for [truename, local] in files.items():
                 print(f"Copying {local} --> {connection_id}:{os.path.join(target, truename)}")
                 sftp_client.put(local, os.path.join(target, truename))
+                # or separate cleanup task?
+                os.unlink(local)
 
     data = extract()
     files = transform(data)

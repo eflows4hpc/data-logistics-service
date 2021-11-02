@@ -48,8 +48,8 @@ def create_draft_record(server: str, token: str, record):
     return response.json()
 
 # the simplest version, target should be chunked
-def add_file(record, fname: str, token: str):
-    jf = os.path.split(fname)[-1]
+def add_file(record, fname: str, token: str, remote:str):
+    jf = os.path.split(remote)[-1]
     return requests.put(url=f"{record['links']['files']}/{jf}",
                          params={'access_token': token},
                          headers={"Content-Type":"application/octet-stream"},

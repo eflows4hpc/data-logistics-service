@@ -99,7 +99,7 @@ class B2ShareOperatorTest(unittest.TestCase):
         with patch('dags.b2shareoperator.requests.post') as put:
             a = tempfile.NamedTemporaryFile()
             a.write(b"some content")
-            up = add_file(record=r, fname=a.name, token=token)
+            up = add_file(record=r, fname=a.name, token=token, remote='/tmp/somefile.txt')
 
 
         with patch('dags.b2shareoperator.requests.patch') as p:
