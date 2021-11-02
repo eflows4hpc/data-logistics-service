@@ -1,38 +1,39 @@
-{% extends 'airflow/main.html' %}
- 
-<!--{% block body %}    
-   <p>
-    <a href="/path/to/target.html">
-        <img src="https://eflows4hpc.eu/wp-content/uploads/2021/01/logo-1.png" alt="eFlows4HPC Logo" title="The title of this image"/>
-    </a>
-   </p>
-   {{ super() }}
-{% endblock %}-->
 {% block footer %}
-  {% if not current_user.is_anonymous %}
-    {% set version_label = 'Version' %}
-    <footer class="footer">
-      <div class="container">
-        <div>
-          {{ version_label }}: {% if airflow_version %}<a href="https://pypi.python.org/pypi/apache-airflow/{{ airflow_version }}" target="_blank">v{{ airflow_version }}</a>{% else %} N/A{% endif %}
-         <div class="jumbotron text-center" style="margin-bottom:0">
-            <p>
-               <a href="https://www.eFlows4HPC.eu">
-                  <img src="https://eflows4hpc.eu/wp-content/uploads/2021/01/logo-1.png" alt="eFlows4HPC Logo" title="The title of this image"/>
-               </a>
-            </p>
-<!--             <p>This is the Data Catalog for the <a href="https://www.eFlows4HPC.eu">eFlows4HPC</a> project</p> -->
-            <p>This work has been supported by the eFlows4HPC project, contract #955558. This project has received funding from the European High-Performance Computing Joint Undertaking (JU) under grant agreement No 955558.<br>The JU receives support from the European Union’s Horizon 2020 research and innovation programme and Spain, Germany, France, Italy, Poland, Switzerland, Norway.</p>
-            <hr>
-            <p>The source code for the Data Catalog is available on <a href="https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service/">gitlab</a>.</p>
-            <p>If there are any technical problems with this site, please create an issue on <a href="https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service/-/issues">gitlab</a>.</p>
-            <hr>
-            <p><a href="https://www.fz-juelich.de/portal/EN/Service/LegalNotice/_node.html">Impressum</a></p>
+<footer class="pt-5 align-self-center align-middle footer" style="height: auto; color: #575756 !important;">
+  <div class="mt-5 pt-5 pb-5">
+    <div class="container">
+      <div></div>
+      <div class="flex-row">
+        <div class="col-lg-3 col-xs-12">
+          <h4 class="text-dark" >Links</h4>
+          <ul class="m-0 p-0" style="list-style-type: none;">
+            <li> <a style="color: #575756" href="https://www.eFlows4HPC.eu">About eFlows4HPC Project</a></li>
+            <li> <a style="color: #575756" href="https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service/-/issues">In case of technical problems, create an issue here</a></li>
+            <li> <a style="color: #575756" href="https://www.fz-juelich.de/portal/EN/Service/LegalNotice/_node.html">Impressum</a></li>
+          </ul>
+          <p></p>
+          <p>
+            <a href="https://twitter.com/eFlows4HPC"><i class="fa fa-twitter-square mr-2 fa-2x bg-dark"></i></a>
+            <a href="https://www.linkedin.com/company/eflows4hpc/"><i class="fa fa-linkedin-square  mr-2 fa-2x"></i></a>
+            <a href="https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service/"><i class="fa fa-github-square mr-2 fa-2x"></i></a>
+          </p>
         </div>
-
+        <div class="col-lg-4 col-xs-12 text-center">
+          <p>
+            <a href="https://www.eFlows4HPC.eu">
+              <img src="https://eflows4hpc.eu/wp-content/uploads/2021/01/logo-1.png" alt="eFlows4HPC Logo" title="The title of this image" /></a>
+          </p>
         </div>
-        <div></div>
+        <div class="col-lg-5 col-xs-12 text-center">
+          <p class="pr-5"><small>This work has been supported by the eFlows4HPC project, contract #955558. This project has received funding from the European High-Performance Computing Joint Undertaking (JU) under grant agreement No 955558.<br>The JU receives support from the European Union’s Horizon 2020 research and innovation programme and Spain, Germany, France, Italy, Poland, Switzerland, Norway. </small></p>
+        </div>
       </div>
-    </footer>
-  {% endif %}
+      <div class="row mt-5">
+        <div class="col text-center">
+          <p style="border-top: 1px solid darkgray;"><small>Based on Apache Airflow {{ version_label }}: {% if airflow_version %}<a href="https://pypi.python.org/pypi/apache-airflow/{{ airflow_version }}" target="_blank">v{{ airflow_version }}</a>{% else %} N/A{% endif %}</small></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
 {% endblock %}
