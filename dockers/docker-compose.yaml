@@ -83,7 +83,7 @@ services:
       test: ["CMD", "pg_isready", "-U", "airflow"]
       interval: 5s
       retries: 5
-    restart: "always"
+    restart: always
 
   redis:
     image: redis:latest
