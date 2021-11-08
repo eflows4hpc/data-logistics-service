@@ -70,8 +70,8 @@
 {% block footer %}
   {% if not current_user.is_anonymous %}
     {% set version_label = 'Version' %}
+    {% include 'appbuilder/footer.html' %}
   {% endif %}
-  {% include 'appbuilder/footer.html' %}
 {% endblock %}
 
 {% block tail_js %}
