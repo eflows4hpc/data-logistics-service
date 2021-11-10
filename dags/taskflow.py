@@ -2,6 +2,7 @@
 from airflow.decorators import dag, task
 from airflow.models.connection import Connection
 from airflow.providers.ssh.hooks.ssh import SSHHook
+from airflow.models import Variable
 from airflow.utils.dates import days_ago
 import os
 
@@ -39,9 +40,12 @@ def taskflow_example():
     @task(multiple_outputs=True)
     def transform(flist: dict):
         name_mappings = {}
+        tmp_dir = Variable.get("working_dir", default_var='/tmp/')
+        print(f"Local working dir is: {tmp_dir}")
+        
         for fname, url in flist.items():
             print(f"Processing: {fname} --> {url}")
-            tmpname = download_file(url=url, target_dir='/tmp/')
+            tmpname = download_file(url=url, target_dir=tmp_dir)
             name_mappings[fname] = tmpname
         return name_mappings
 

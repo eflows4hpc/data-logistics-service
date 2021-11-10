@@ -1,0 +1,22 @@
+{
+  "default_b2share": {
+    "conn_type": "https",
+    "description": null,
+    "host": "b2share-testing.fz-juelich.de",
+    "login": null,
+    "password": null,
+    "schema": "",
+    "port": null,
+    "extra": null
+  },
+  "default_ssh": {
+    "conn_type": "ssh",
+    "description": null,
+    "host": "openssh-server",
+    "login": "eflows",
+    "password": "rand",
+    "schema": null,
+    "port": 2222,
+    "extra": null
+  }
+}

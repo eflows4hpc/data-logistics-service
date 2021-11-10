@@ -56,13 +56,13 @@ x-airflow-common:
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__API__AUTH_BACKEND: 'airflow.api.auth.backend.basic_auth'
-    _AIRFLOW_WWW_USER_PASSWORD: 'somepass'
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
   volumes:
     - ./dags:/opt/airflow/dags
+    - ./config/airflow.cfg:/opt/airflow/airflow.cfg
     - ./logs:/opt/airflow/logs
     - ./plugins:/opt/airflow/plugins
-    - ./config/airflow.cfg:/opt/airflow/airflow.cfg
+    - ./templates/main.html:/home/airflow/.local/lib/python3.7/site-packages/airflow/www/templates/airflow/main.html
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -102,13 +102,9 @@ services:
     command: webserver
     ports:
       - 7001:8080
-    volumes: 
-      - ./templates/footer.html:/home/airflow/.local/lib/python3.7/site-packages/airflow/www/templates/appbuilder/footer.html
-      - ./templates/main.html:/home/airflow/.local/lib/python3.7/site-packages/airflow/www/templates/airflow/main.html
-      - ./config/airflow.cfg:/opt/airflow/airflow.cfg
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
-      interval: 10s
+      interval: 60s
       timeout: 10s
       retries: 5
     restart: always
@@ -122,7 +118,7 @@ services:
     command: scheduler
     healthcheck:
       test: ["CMD-SHELL", 'airflow jobs check --job-type SchedulerJob --hostname "$${HOSTNAME}"']
-      interval: 10s
+      interval: 60s
       timeout: 10s
       retries: 5
     restart: always
@@ -138,7 +134,7 @@ services:
       test:
         - "CMD-SHELL"
         - 'celery --app airflow.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}"'
-      interval: 10s
+      interval: 30s
       timeout: 10s
       retries: 5
     environment:
@@ -147,6 +143,11 @@ services:
       # See https://airflow.apache.org/docs/docker-stack/entrypoint.html#signal-propagation
       DUMB_INIT_SETSID: "0"
     restart: always
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./config/airflow.cfg:/opt/airflow/airflow.cfg
+      - ./logs:/opt/airflow/logs
+      - ./tmp/:/work/
     depends_on:
       <<: *airflow-common-depends-on
       airflow-init:
@@ -157,9 +158,14 @@ services:
     command: triggerer
     healthcheck:
       test: ["CMD-SHELL", 'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"']
-      interval: 10s
+      interval: 60s
       timeout: 10s
       retries: 5
+    environment:
+      <<: *airflow-common-env
+      # Required to handle warm shutdown of the celery workers properly
+      # See https://airflow.apache.org/docs/docker-stack/entrypoint.html#signal-propagation
+      DUMB_INIT_SETSID: "0"
     restart: always
     depends_on:
       <<: *airflow-common-depends-on
@@ -256,17 +262,19 @@ services:
       - -c
       - airflow
 
-  flower:
+  airflow-setup:
     <<: *airflow-common
-    command: celery flower
-    ports:
-      - 5555:5555
-    healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:5555/"]
-      interval: 10s
-      timeout: 10s
-      retries: 5
-    restart: always
+    environment:
+      <<: *airflow-common-env
+      CONNECTION_CHECK_MAX_COUNT: "0"
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        exec /entrypoint airflow variables import /opt/airflow/variables.json
+        echo "Variables added"
+    volumes:
+      - ./dockers/variables.json:/opt/airflow/variables.json
     depends_on:
       <<: *airflow-common-depends-on
       airflow-init:

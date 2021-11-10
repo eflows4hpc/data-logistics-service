@@ -4,8 +4,8 @@ eFlows4HPC Data Logistics Service
 
 
 ```
-mkdir ./logs ./plugins
-echo -e "AIRFLOW_UID=$(id -u)\nAIRFLOW_GID=0" > .env
+mkdir ./logs
+echo -e "AIRFLOW_UID=$(id -u)" > .env
 reqs=`cat requirements.txt | tr '\n' ' '`
 echo "_PIP_ADDITIONAL_REQUIREMENTS=$reqs" >> .env
 
