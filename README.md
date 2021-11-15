@@ -2,8 +2,12 @@
 
 eFlows4HPC Data Logistics Service
 
+This work has been supported by the eFlows4HPC project, contract #955558. This project has received funding from the European High-Performance Computing Joint Undertaking (JU) under grant agreement No 955558. The JU receives support from the European Union’s Horizon 2020 research and innovation programme and Spain, Germany, France, Italy, Poland, Switzerland, Norway.
+
+## Install and run
 
 ```
+git pull ...
 mkdir ./logs ./tmp
 echo -e "AIRFLOW_UID=$(id -u)" > .env
 reqs=`cat requirements.txt | tr '\n' ' '`
