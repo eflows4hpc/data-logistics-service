@@ -84,41 +84,49 @@
 {% endblock %}
 
 {% block footer %}
-<footer class="footer" style="background-image: url(https://eflows4hpc.eu/wp-content/uploads/2021/02/Barra-gris-footer.png) !important; height: auto; color: #575756 !important;">
-    <div class="container">
-      <div class="p-0 w-100" style="background-image: url(https://eflows4hpc.eu/wp-content/uploads/2021/01/barra-3-color-8.png) !important; width: 100%; height: 15px; background-repeat: no-repeat; background-size: cover"></div>
-      <div class="row mt-2 px-3">
-        <div class="col-lg-6 col-12 d-inlign-flex">
-          <p class="m-3 text-center align-self-center">
-            <a href="https://www.eFlows4HPC.eu">
-              <img src="https://eflows4hpc.eu/wp-content/uploads/2021/02/logo-blanc_1-1.svg" alt="eFlows4HPC Logo" title="eFlows4HPC" style="height: auto; max-height: 70px;" class="m-4 align-self-center"/>
-            </a>
-            <a href="https://twitter.com/eFlows4HPC"><i class="fa fa-twitter-square m-4 fa-2x" style="color: white"></i></a>
-            <a href="https://www.linkedin.com/company/eflows4hpc/"><i class="fa fa-linkedin-square  mr-4 fa-2x" style="color: white"></i></a>
-            <a href="https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service/"><i class="fa fa-github-square mr-4 fa-2x" style="color: white"></i></a>
-          </p>
-        </div>
-        <div class="col-lg-6 col-12 d-inlign-flex">
-          <p class="m-2 align-self-center" style="color: white">
-            <span class="mr-3 mt-1 float-left">
-              <img loading="lazy" src="https://eflows4hpc.eu/wp-content/uploads/2021/01/bandera-8.png" alt="" style="max-width:52px; max-height:34px">
-            </span>
-            <small style="display: flow-root">
-              This work has been supported by the eFlows4HPC project, contract #955558. This project has received funding from the European High-Performance Computing Joint Undertaking (JU) under grant agreement No 955558.
-              <br>
-              The JU receives support from the European Union’s Horizon 2020 research and innovation programme and Spain, Germany, France, Italy, Poland, Switzerland, Norway. 
-              <strong>
-              <a style="color: #f39200" href="https://www.fz-juelich.de/portal/EN/Service/LegalNotice/_node.html">Impressum</a>
-              </strong>
-            </small>
-            <div class="row mt-4 pl-5">
-              <p style="border-top: 1px solid darkgray;"><small>This service is based on Apache Airflow {{ version_label }}: {% if airflow_version %}<a href="https://pypi.python.org/pypi/apache-airflow/{{ airflow_version }}" target="_blank">v{{ airflow_version }}</a>{% else %} N/A{% endif %}</small></p>
-            </div>
-          </p>
-        </div>
-      </div>
+  {% if not current_user.is_anonymous %}
+    {% set version_label = 'Version' %}
+    <!-- Use a wrapper div to detach the footer from the content. -->
+    <div style="padding-bottom: 3rem !important; display: none; flex-grow: 1 !important; -ms-flex-direction: column !important; display: flex !important;
+      flex-direction: column !important;">
+    Wrapper
     </div>
-</footer>
+    <footer class="footer" style="background-image: url(https://eflows4hpc.eu/wp-content/uploads/2021/02/Barra-gris-footer.png) !important; height: auto; color: #575756 !important; background-repeat: no-repeat !important; background-size: cover !important; margin-top: 2rem;">
+        <div class="container p-0" style="padding: 0px !important">
+          <div class="p-0 w-100" style="background-image: url(https://eflows4hpc.eu/wp-content/uploads/2021/01/barra-3-color-8.png) !important; width: 100%; height: 15px; background-repeat: no-repeat !important; background-size: cover !important; padding: 0px; !important"></div>
+          <div class="row mt-2 px-3" style="margin-top: 0.5rem; padding-right: 1rem;">
+            <div class="col-lg-6 col-12 d-inlign-flex">
+              <p class="m-3 text-center align-self-center" style="-ms-flex-item-align: center !important; align-self: center !important; margin: 1rem !important">
+                <a href="https://www.eFlows4HPC.eu">
+                  <img src="https://eflows4hpc.eu/wp-content/uploads/2021/02/logo-blanc_1-1.svg" alt="eFlows4HPC Logo" title="eFlows4HPC" style="height: auto; max-height: 70px;" class="m-4 align-self-center"/>
+                </a>
+                <a href="https://twitter.com/eFlows4HPC"><i class="fa fa-twitter-square m-4 fa-2x" style="color: white"></i></a>
+                <a href="https://www.linkedin.com/company/eflows4hpc/"><i class="fa fa-linkedin-square  mr-4 fa-2x" style="color: white"></i></a>
+                <a href="https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service/"><i class="fa fa-github-square mr-4 fa-2x" style="color: white"></i></a>
+              </p>
+            </div>
+            <div class="col-lg-6 col-12 d-inlign-flex">
+              <p class="m-2 align-self-center" style="color: white; -ms-flex-item-align: center !important; align-self: center !important; margin: 0.5rem;">
+                <span class="mr-3 mt-1 float-left" style="float: left !important; margin-right: 1rem; margin-top: 0.25rem ">
+                  <img loading="lazy" src="https://eflows4hpc.eu/wp-content/uploads/2021/01/bandera-8.png" alt="" style="max-width:52px; max-height:34px;">
+                </span>
+                <small style="display: flow-root">
+                  This work has been supported by the eFlows4HPC project, contract #955558. This project has received funding from the European High-Performance Computing Joint Undertaking (JU) under grant agreement No 955558.
+                  <br>
+                  The JU receives support from the European Union’s Horizon 2020 research and innovation programme and Spain, Germany, France, Italy, Poland, Switzerland, Norway. 
+                  <strong>
+                  <a style="color: #f39200" href="https://www.fz-juelich.de/portal/EN/Service/LegalNotice/_node.html">Impressum</a>
+                  </strong>
+                </small>
+                <div class="row mt-4 pl-5" style="margin-top: 1.5rem; padding-left: 3rem !important; ">
+                  <p style="border-top: 1px solid darkgray;"><small>This service is based on Apache Airflow {{ version_label }}: {% if airflow_version %}<a href="https://pypi.python.org/pypi/apache-airflow/{{ airflow_version }}" target="_blank">v{{ airflow_version }}</a>{% else %} N/A{% endif %}</small></p>
+                </div>
+              </p>
+            </div>
+          </div>
+        </div>
+    </footer>
+  {% endif %}
 {% endblock %}
 
 {% block tail_js %}
