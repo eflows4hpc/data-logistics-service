@@ -56,8 +56,10 @@ runcmd:
   - cp -r ../data-logistics-service/plugins/* ./plugins
   - cp ../data-logistics-service/config/* ./config
   - cp ../data-logistics-service/templates/* ./templates
-  - echo -e "AIRFLOW_UID=$(id -u)" > ../data-logistics-service/dockers/.env #for root
+  # - echo -e "AIRFLOW_UID=$(id -u)" > ../data-logistics-service/dockers/.env #for root
   - export AIRFLOW_UID=$(id -u)
+  - reqs=`cat ~/data-logistics-service/requirements.txt | tr '\n' ' '`
+  - echo "_PIP_ADDITIONAL_REQUIREMENTS=$reqs" >> ~/data-logistics-service/dockers/.env
   - docker-compose -f ~/data-logistics-service/dockers/docker-compose.yaml --project-directory ~/airflow --verbose up airflow-init
   - docker-compose -f ~/data-logistics-service/dockers/docker-compose.yaml --project-directory ~/airflow . up
   # - /bin/bash ../data-logistics-service/scripts/deployment.sh .
