@@ -12,3 +12,11 @@ class AirflowEFlowsPlugin(AirflowPlugin):
     hooks = []
     admin_views = []
     appbuilder_menu_items = [appbuilder_eFlows]
+
+class AirflowDataCatPlugin(AirflowPlugin):
+    name = "Data Catalogue"
+    operators = []
+    flask_blueprints = []
+    hooks = []
+    admin_views = []
+    appbuilder_menu_items = [{"name": "Data Catalogue", "href": "https://datacatalog.fz-juelich.de/index.html"}]
