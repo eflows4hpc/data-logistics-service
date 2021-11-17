@@ -49,16 +49,15 @@ users:
 runcmd:
   - 'git clone https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service.git /home/maria/data-logistics-service'
   - cd /home/maria
-  - mkdir airflow-testing
-  - cd airflow-testing
+  - mkdir airflow
+  - cd airflow
   - mkdir -p ./dags ./logs ./plugins ./config ./templates
   - cp ../data-logistics-service/dags/* ./dags
   - cp -r ../data-logistics-service/plugins/* ./plugins
   - cp ../data-logistics-service/config/* ./config
   - cp ../data-logistics-service/templates/* ./templates
-  # - echo "AIRFLOW_UID=0\nAIRFLOW_GID=0" > ../data-logistics-service/dockers/.env #for root
+  - echo -e "AIRFLOW_UID=$(id -u)" > ../data-logistics-service/dockers/.env #for root
   - export AIRFLOW_UID=$(id -u)
-  - export AIRFLOW_GID=0
-  - docker-compose -f ../data-logistics-service/dockers/docker-compose.yaml --project-directory . --verbose up airflow-init
-  - docker-compose -f ../data-logistics-service/dockers/docker-compose.yaml --project-directory . up
+  - docker-compose -f ~/data-logistics-service/dockers/docker-compose.yaml --project-directory ~/airflow --verbose up airflow-init
+  - docker-compose -f ~/data-logistics-service/dockers/docker-compose.yaml --project-directory ~/airflow . up
   # - /bin/bash ../data-logistics-service/scripts/deployment.sh .
