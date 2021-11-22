@@ -12,7 +12,8 @@ packages:
   - python3
   - python3-pip
   - docker.io
-  - docker-compose
+  # apt-get of ubuntu 20.04 LTS does not install the newest version of docker-compose.
+  # - docker-compose
 
 # Add users to the system. Users are added after groups are added.
 
@@ -48,6 +49,7 @@ users:
 
 runcmd:
   - sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  - sudo chmod +x /usr/local/bin/docker-compose
   - 'git clone https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service.git /home/maria/data-logistics-service'
   - cd /home/maria
   - mkdir airflow
