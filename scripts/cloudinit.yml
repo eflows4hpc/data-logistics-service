@@ -63,7 +63,7 @@ runcmd:
   - echo "Collectin requirements"
   - reqs=`cat ~/data-logistics-service/requirements.txt | tr '\n' ' '`
   - echo $reqs
-  - echo "_PIP_ADDITIONAL_REQUIREMENTS=$reqs" >> ~/data-logistics-service/dockers/.env
+  - sudo sh -c "echo \"_PIP_ADDITIONAL_REQUIREMENTS=$reqs\" >> /home/maria/data-logistics-service/dockers/.env"
   - echo "Bringing up the docker containers"
   - docker-compose -f ~/data-logistics-service/dockers/docker-compose.yaml --project-directory ~/airflow --verbose up airflow-init
   - docker-compose -f ~/data-logistics-service/dockers/docker-compose.yaml --project-directory ~/airflow . up
