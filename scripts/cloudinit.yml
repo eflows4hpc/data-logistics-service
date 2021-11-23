@@ -67,7 +67,7 @@ runcmd:
   - sudo sh -c "echo \"_PIP_ADDITIONAL_REQUIREMENTS=$reqs\" >> /home/maria/data-logistics-service/dockers/.env"
   - echo "Bringing up the docker containers"
   - docker-compose -f ./dockers/docker-compose.yaml --project-directory ../airflow --verbose up airflow-init
-  - docker-compose -f ./dockers/docker-compose.yaml --project-directory ../airflow . up
+  - docker-compose -f ./dockers/docker-compose.yaml --project-directory ../airflow up -d
   # - /bin/bash ./scripts/deployment.sh .
 
 final_message: "The system is finally up, after $UPTIME seconds"
