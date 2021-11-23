@@ -40,14 +40,14 @@ includes one 100MB file. The target parameter is optional with default value +/t
 
 ----
 curl -X POST -u USER:PASS -H "Content-Type: application/json" \
-   --data '{"conf": {"oid": ID}, "target": PATH}' \
+   --data '{"conf": {"oid": ID, "target": PATH}}' \
    $DLS/dags/taskflow_example/dagRuns
 ----
 
 If you want to use your own connection ('myown_con'):
 ----
 curl -X POST -u USER:PASS -H "Content-Type: application/json" \
-   --data '{"conf": {"oid": ID}, "target": PATH, "connection": "myown_con"}' \
+   --data '{"conf": {"oid": ID, "target": PATH, "connection": "myown_con"}}' \
    $DLS/dags/taskflow_example/dagRuns
 ----
 
