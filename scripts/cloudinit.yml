@@ -59,11 +59,11 @@ runcmd:
   - cp -r plugins/* ../airflow/plugins
   - cp config/* ../airflow/config
   - cp templates/* ../airflow/templates
-  # - echo -e "AIRFLOW_UID=$(id -u)" > ../data-logistics-service/dockers/.env #for root
+  - echo -e "AIRFLOW_UID=$(id -u)" > /home/maria/data-logistics-service/dockers/.env
   - export AIRFLOW_UID=$(id -u)
   - echo "Collecting requirements"
   - reqs=`cat requirements.txt | tr '\n' ' '`
-  - echo "Collected -> $reqs"
+  - echo "Collected - $reqs"
   - sudo sh -c "echo \"_PIP_ADDITIONAL_REQUIREMENTS=$reqs\" >> /home/maria/data-logistics-service/dockers/.env"
   - echo "Bringing up the docker containers"
   - docker-compose -f ./dockers/docker-compose.yaml --project-directory ../airflow --verbose up airflow-init
