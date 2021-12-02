@@ -49,25 +49,26 @@ users:
 
 runcmd:
   - sudo pip3 install docker-compose
-  - 'git clone https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service.git /home/maria/data-logistics-service'
   - cd /home/maria
-  - mkdir airflow
-  - cd airflow
-  - mkdir -p ./dags ./logs ./plugins ./config ./templates
-  - cd ../data-logistics-service
-  - cp dags/* ../airflow/dags
-  - cp -r plugins/* ../airflow/plugins
-  - cp config/* ../airflow/config
-  - cp templates/* ../airflow/templates
-  - echo -e "AIRFLOW_UID=$(id -u)" > /home/maria/data-logistics-service/dockers/.env
-  - export AIRFLOW_UID=$(id -u)
-  - echo "Collecting requirements"
-  - reqs=`cat requirements.txt | tr '\n' ' '`
-  - echo "Collected - $reqs"
-  - sudo sh -c "echo \"_PIP_ADDITIONAL_REQUIREMENTS=$reqs\" >> /home/maria/data-logistics-service/dockers/.env"
-  - echo "Bringing up the docker containers"
-  - docker-compose -f ./dockers/docker-compose.yaml --project-directory ../airflow --verbose up airflow-init
-  - docker-compose -f ./dockers/docker-compose.yaml --project-directory ../airflow up -d
-  # - /bin/bash ./scripts/deployment.sh .
+  - 'git clone https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service.git ./data-logistics-service'
+  # - mkdir airflow
+  # - cd airflow
+  # - mkdir -p ./dags ./logs ./plugins ./config ./templates
+  # - cd ../data-logistics-service
+  # - cp dags/* ../airflow/dags
+  # - cp -r plugins/* ../airflow/plugins
+  # - cp config/* ../airflow/config
+  # - cp templates/* ../airflow/templates
+  # - echo -e "AIRFLOW_UID=$(id -u)" > /home/maria/data-logistics-service/dockers/.env
+  # - export AIRFLOW_UID=$(id -u)
+  # - echo "Collecting requirements"
+  # - reqs=`cat requirements.txt | tr '\n' ' '`
+  # - echo "Collected - $reqs"
+  # - sudo sh -c "echo \"_PIP_ADDITIONAL_REQUIREMENTS=$reqs\" >> /home/maria/data-logistics-service/dockers/.env"
+  # - pip install -r requirements.txt
+  # - echo "Bringing up the docker containers"
+  # - docker-compose -f ./dockers/docker-compose.yaml --project-directory ../airflow --verbose up airflow-init
+  # - docker-compose -f ./dockers/docker-compose.yaml --project-directory ../airflow up -d
+  - /bin/bash ../data-logistics-service/scripts/deployment.sh /home/maria /home/maria/data-logistics-service
 
 final_message: "The system is finally up, after $UPTIME seconds"
