@@ -19,6 +19,7 @@ stages:
   - build
   - publish
   - deploy
+  - cleanup
 
 test:
   stage: test
