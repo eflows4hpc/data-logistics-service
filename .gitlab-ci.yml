@@ -59,8 +59,8 @@ cleanup-successful-full-deployment:
   # check if there is an old prod or test instance, and delete it if present
   stage: cleanup
   when: on_success
-  only:
-    - web
+  # only:
+  #   - web
   script:
     - echo "This is the cleanup for the full-redeployment of the testing or production servers"
     - echo "if this job is reached, all earlier jobs were successful, and any lingering old instances need to be removed"

@@ -51,6 +51,9 @@ runcmd:
   - sudo pip3 install docker-compose
   - cd /home/maria
   - 'git clone https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service.git ./data-logistics-service'
+  - cd ./data-logistics-service
+  - sudo git checkout mptest
+  - cd ..
   # - mkdir airflow
   # - cd airflow
   # - mkdir -p ./dags ./logs ./plugins ./config ./templates
@@ -69,6 +72,6 @@ runcmd:
   # - echo "Bringing up the docker containers"
   # - docker-compose -f ./dockers/docker-compose.yaml --project-directory ../airflow --verbose up airflow-init
   # - docker-compose -f ./dockers/docker-compose.yaml --project-directory ../airflow up -d
-  - /bin/bash ../data-logistics-service/scripts/deployment.sh /home/maria /home/maria/data-logistics-service
+  - /bin/bash data-logistics-service/scripts/deployment.sh /home/maria /home/maria/data-logistics-service
 
 final_message: "The system is finally up, after $UPTIME seconds"

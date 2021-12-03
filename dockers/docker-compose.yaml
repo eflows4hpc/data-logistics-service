@@ -64,7 +64,7 @@ x-airflow-common:
     - ./plugins:/opt/airflow/plugins
     - ./templates/main.html:/home/airflow/.local/lib/python3.7/site-packages/airflow/www/templates/airflow/main.html
   user: "${AIRFLOW_UID:-50000}:0"
-  command: pip3 install -r requirements.txt
+  # command: pip3 install -r requirements.txt
   depends_on:
     &airflow-common-depends-on
     redis:
