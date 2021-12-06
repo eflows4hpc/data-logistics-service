@@ -5,32 +5,34 @@
 # deployment.sh <project_directory> <git_directory> [API_URL] [SERVER_DOMAIN]
 
 OLD_DIR=`pwd`
-GIT_REPO=$OLD_DIR/data-logistics-service
+GIT_REPO=$HOME/data-logistics-service
 
 echo "DEBUG_1 $0 $1 $2 $3 $4"
 
-if [ -z ${1+x} ]; then NEW_DIR=`pwd`; else NEW_DIR=$1; fi
-if [ -z ${2+x} ]; then GIT_REPO else GIT_REPO=$2; fi
+#if null (var + trim empty strings)
+if [ -z ${1+x} ]; then ENTRYPOINT=`pwd`; else ENTRYPOINT=$1; fi
+if [ -z ${2+x} ]; then echo "No user input for starting repository location. Default value: $GIT_REPO"; else GIT_REPO=$2; fi
 # if [ -z ${2+x} ]; then API_URL=https://datacatalog.fz-juelich.de/; else API_URL=$2; fi
 # if [ -z ${3+x} ]; then SERVER_DOMAIN=datacatalog.fz-juelich.de; else SERVER_DOMAIN=$3; fi
 
 echo "DEBUG_2 $0 $1 $2 $3 $4"
-echo "DEBUG values: OLD_DIR=$OLD_DIR, NEW_DIR=$NEW_DIR and GIT_REPO=$GIT_REPO"
+echo "DEBUG values: OLD_DIR=$OLD_DIR, ENTRYPOINT_DIR=$ENTRYPOINT and GIT_REPO=$GIT_REPO"
 
-cd $NEW_DIR
-`mkdir -p airflow`
+cd $ENTRYPOINT
+mkdir -p airflow
 cd airflow
 AIRFLOW_DIR=`pwd`
-echo "Project dir is: $AIRFLOW_DIR"
-echo "User in use is: $(whoami)"
+#DEBUG prints
+echo "Project dir is set to: $AIRFLOW_DIR"
+echo "Proceeding as user: $(whoami)"
 
 # Make the necessary folders for the airflow artefacts and copy the corresponging content
-`mkdir -p ./dags ./logs ./plugins ./config ./templates`
+mkdir -p ./dags ./logs ./plugins ./config ./templates
 cd $GIT_REPO
-`cp dags/* $AIRFLOW_DIR/dags`
-`cp -r plugins/* $AIRFLOW_DIR/plugins`
-`cp config/* $AIRFLOW_DIR/config`
-`cp templates/* $AIRFLOW_DIR/templates`
+cp dags/* $AIRFLOW_DIR/dags
+cp -r plugins/* $AIRFLOW_DIR/plugins
+cp config/* $AIRFLOW_DIR/config
+cp templates/* $AIRFLOW_DIR/templates
 # Setup environment variables and install requirements
 echo -e "AIRFLOW_UID=$(id -u)" > $GIT_REPO/dockers/.env
 export AIRFLOW_UID=$(id -u)

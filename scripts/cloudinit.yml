@@ -29,7 +29,7 @@ users:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCRsldcJ7kiksXTn2hivYfZ+Y9gziBWaMPpfVPNVlPi5XizbMurXAPQ3gUbBTDRp+Plf5LiXAfFNBdPTACb5ymFhIUKj/3sJhxc92uvJktLyjObAZ74ImBzDhVwGzs/cKhWc2otFgyMwrfPuIxdarCiLTjmG+dZ0a+IZbWta241kc3qBPjuqKK/LSZOK/Jx9Dl4rURs780GdcoA7Q2r6I6Bq8m0Cpfl2Otwi5Vr4d6hxWrl8D100ssLctn4FlL4SzVHPyZJVNeFJYQv1boJwldHBST8tJ0r0KC1V5CboB+Rdh1b/Qy1y6l/y9fPX+axFSGIIxSb6egRSwcE89f3kCC1 cboettcher@zam024
 
 
-  - name: maria
+  - name: mpetrova
     gecos: Maria Petrova-El Sayed
     groups: sudo, docker
     shell: /bin/bash
@@ -49,11 +49,11 @@ users:
 
 runcmd:
   - sudo pip3 install docker-compose
-  - cd /home/maria
-  - 'git clone https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service.git ./data-logistics-service'
+  - cd /home/mpetrova
+  - echo "Current user: $(whoami)"
+  - sudo -u mpetrova git clone https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service.git ./data-logistics-service
   - cd ./data-logistics-service
-  - sudo git checkout mptest
-  - cd ..
+  - git checkout mptest #only for testing
   # - mkdir airflow
   # - cd airflow
   # - mkdir -p ./dags ./logs ./plugins ./config ./templates
@@ -72,6 +72,6 @@ runcmd:
   # - echo "Bringing up the docker containers"
   # - docker-compose -f ./dockers/docker-compose.yaml --project-directory ../airflow --verbose up airflow-init
   # - docker-compose -f ./dockers/docker-compose.yaml --project-directory ../airflow up -d
-  - /bin/bash data-logistics-service/scripts/deployment.sh /home/maria /home/maria/data-logistics-service
+  - sudo -u mpetrova /bin/bash data-logistics-service/scripts/deployment.sh /home/mpetrova /home/mpetrova/data-logistics-service
 
 final_message: "The system is finally up, after $UPTIME seconds"
