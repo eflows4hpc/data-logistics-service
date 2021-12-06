@@ -55,7 +55,6 @@ runcmd:
   - sudo -u mpetrova git clone https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service.git ./data-logistics-service
   - cd ./data-logistics-service
   - git checkout mptest #only for testing
-  - cat ./scripts/deployment.sh
   # - mkdir airflow
   # - cd airflow
   # - mkdir -p ./dags ./logs ./plugins ./config ./templates
@@ -74,6 +73,6 @@ runcmd:
   # - echo "Bringing up the docker containers"
   # - docker-compose -f ./dockers/docker-compose.yaml --project-directory ../airflow --verbose up airflow-init
   # - docker-compose -f ./dockers/docker-compose.yaml --project-directory ../airflow up -d
-  - sudo -u mpetrova /bin/bash data-logistics-service/scripts/deployment.sh /home/mpetrova /home/mpetrova/data-logistics-service
+  - sudo -u mpetrova /bin/bash ./scripts/deployment.sh /home/mpetrova /home/mpetrova/data-logistics-service
 
 final_message: "The system is finally up, after $UPTIME seconds"
