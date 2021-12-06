@@ -24,7 +24,7 @@ cd airflow
 AIRFLOW_DIR=`pwd`
 #DEBUG prints
 echo "Project dir is set to: $AIRFLOW_DIR"
-echo "Proceeding as user: $(whoami)"
+echo "Proceeding as user $(whoami)"
 
 # Make the necessary folders for the airflow artefacts and copy the corresponging content
 mkdir -p ./dags ./logs ./plugins ./config ./templates

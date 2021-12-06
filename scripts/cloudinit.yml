@@ -48,12 +48,14 @@ users:
   #     - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDQMbfKUO3NoZspgWpzFY+SwY5Tx251oBT/F22pmnqKq3A0U1EcRooYVc11HzDmLrDTkoLSWAYPuv7I8weKqUPMlypXygu7I1kw1JoAZ4veV/TO8kBIb8+fUjD4VnD0EuU9/MD4rc0IazlInUu/5H2oDj4cj3XGoOFHAPRvo1YXF2eEbXgHcos5o52idZfvZPeWmk4wLqWUI+4q1C5o+c9xGxdWkA0Z6cErw5jSfaqIMu9GnsaPE8dDZ89vtNu8kRK97/Ax0qmJ8eLBfv3qm2HnqACRUv1MRLS/s9KsdB18DV6dTn8VuErJsn9rlpx/2oEMVS5lkUSLTJHf7oNVKDtILQ/rQ2tF/f3LakmiViA4ZsWxFspP0T/sXPhjuCgEqGWG8HrJwFj8DByMpoJUsGe1czAiMdoY5Tr7UeIgK7BGaGjoVUFaVrCKlDpDNhYsHopSTTNajVxsb0LkTRIRphGlQTHlD3nDYdHIrgZiLqA1XLtTTXtWNzQ4uE59tAkIzdTK7RSBduHunqx++IEO6Huj49Vvk1vcO33iqFTTZro1vhZ2kEGxAkxNMti+/eT2rvyfkhsXaUH1/7LXvRrR+pFKcXBpaWWeEt8cOiVrMWAPDi9VRh5QPZbJ1tyTq7XzxeaQuJhL22o2BO13ZSRzr1S+UNFcmfk3esruZoxDIiQ+Bw== apiserver@gitlab
 
 runcmd:
+  - echo "Downloading latest version of docker-compose"
   - sudo pip3 install docker-compose
   - cd /home/mpetrova
-  - echo "Current user: $(whoami)"
+  - echo "Current user is $(whoami)"
   - sudo -u mpetrova git clone https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service.git ./data-logistics-service
   - cd ./data-logistics-service
   - git checkout mptest #only for testing
+  - cat ./scripts/deployment.sh
   # - mkdir airflow
   # - cd airflow
   # - mkdir -p ./dags ./logs ./plugins ./config ./templates
