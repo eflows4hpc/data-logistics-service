@@ -38,41 +38,22 @@ users:
     ssh_authorized_keys:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDUNFmYnaZ1raXQm04/mfdoBfn4i6xYknic2nhGDOrkhp5r6kv4F1m7wgtuL/pddRKuEoQpiXjRWciEMljFmxvVc7+9VitsAn5zBsnzY9+Sq9+si5aKe93RK8JGLX/WsfZGnPMdKPkK2GO9LFJN4TyL9hTpFdFQfxtO82NIa3WikG4RI+WQuKeQ4qr8FHNymr+gHTw/+YaM9331xnM5YqkmOC27CvVtiQx96MNMAyMQ8RJcHy1GL8donTBL+knVZdIwGt4SUy9dIF8iwTXGFkLe8V7/DIEB7RW9gvk2sG3YPo2eq56HsQKAB3yre+5QFhmH/uqUnTKVFgZLqlDUC0duFOwALCRmlEgtOeZqOzRBa6a0RveTIfccMb48ac4FpeeJdo4KId1QO1JaEZ8fYKgRVw3xRuOjDMpxCFuxELpSvx/hd1jgrK9lRizH9DXNf5/5Go2O16hj8LPufBbhX2EiChjWJEJkoRWBhQ3UHmstbqRiuNU/MsHq0FPSHMHV6BU= maria@jsc-strela
 
-#TODO do a proper ssh key if needed, this has been excluded so far so that the testing of the use case goes faster
-  # - name: airflows
-  #   gecos: Common user for running the apiserver
-  #   groups: sudo
-  #   sudo: ALL=(ALL) NOPASSWD:ALL
-  #   lock_passwd: true
-  #   ssh_authorized_keys:
-  #     - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDQMbfKUO3NoZspgWpzFY+SwY5Tx251oBT/F22pmnqKq3A0U1EcRooYVc11HzDmLrDTkoLSWAYPuv7I8weKqUPMlypXygu7I1kw1JoAZ4veV/TO8kBIb8+fUjD4VnD0EuU9/MD4rc0IazlInUu/5H2oDj4cj3XGoOFHAPRvo1YXF2eEbXgHcos5o52idZfvZPeWmk4wLqWUI+4q1C5o+c9xGxdWkA0Z6cErw5jSfaqIMu9GnsaPE8dDZ89vtNu8kRK97/Ax0qmJ8eLBfv3qm2HnqACRUv1MRLS/s9KsdB18DV6dTn8VuErJsn9rlpx/2oEMVS5lkUSLTJHf7oNVKDtILQ/rQ2tF/f3LakmiViA4ZsWxFspP0T/sXPhjuCgEqGWG8HrJwFj8DByMpoJUsGe1czAiMdoY5Tr7UeIgK7BGaGjoVUFaVrCKlDpDNhYsHopSTTNajVxsb0LkTRIRphGlQTHlD3nDYdHIrgZiLqA1XLtTTXtWNzQ4uE59tAkIzdTK7RSBduHunqx++IEO6Huj49Vvk1vcO33iqFTTZro1vhZ2kEGxAkxNMti+/eT2rvyfkhsXaUH1/7LXvRrR+pFKcXBpaWWeEt8cOiVrMWAPDi9VRh5QPZbJ1tyTq7XzxeaQuJhL22o2BO13ZSRzr1S+UNFcmfk3esruZoxDIiQ+Bw== apiserver@gitlab
+  - name: airflow
+    gecos: Common user for running the airflow services
+    groups: sudo
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCeJcmX8ogs4/KDQwsQHdCwk5iZz7bYJdthvX0y0YIrslhkW1KfDbOJMdRRLBcKmSCIdPofRkWkgj1hFEW4MqDCNSftLfUDTsymxNdF0dZxaX0jM2K1K7sFr1JG2Lkuxao2g9AoRKqyydlVhApoY8UhwpDaNOAFx5q0Pa7FchWvFX37r0AU5JZTsDFSDM9NaSZll78vwK1wjhhHi4EEFAs2IkrySOGzJTkaHwZrqYMJgEIvtfHN14UJR9WDmnPvSIRe/GzRg1xz3Op4E+S0/jK2bR5jJTMJJka19FjShxlqMr0UbhwBgiKYRhpfqhy+MWGz9H5GvWNdiUbBV8jdlZQHjFujAlzErJ/Twmnn0YVNUX+9ZoyEa/NKMS2quKAUhhQaD04TbAIKNt0iFbOFcbrfpbBXw7PiruIeHGFgmcxug3FcOX6xmHVuPVi1Zm1CxMxaydS7QStUchZdHN0Rc9AF2MOB/ZuKQCUbJZ2pKpP5i90eLbwhZAYvH5DAn9g6w+/6CjuFj1fB4Ywgmv+TvZ0NwtrJRhARN/1nY9uxVSoFAvxrlx3FU0bw0c/3YojY9j+LBJYf+e3Y1R2ZBSVUYGn2eACF86fnGs6Bz/WmrZW6WWrSiEwxtElkQRnuAb35L/V5VFrZv+x0qtoMNl0EK0Rz6CKMD5HHrI6Z2FNqOO6bEQ== service@gitlab
 
 runcmd:
   - echo "Downloading latest version of docker-compose"
   - sudo pip3 install docker-compose
-  - cd /home/mpetrova
+  - cd /home/airflow
   - echo "Current user is $(whoami)"
-  - sudo -u mpetrova git clone https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service.git ./data-logistics-service
+  - sudo -u airflow git clone https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service.git ./data-logistics-service
   - cd ./data-logistics-service
   - git checkout mptest #only for testing
-  # - mkdir airflow
-  # - cd airflow
-  # - mkdir -p ./dags ./logs ./plugins ./config ./templates
-  # - cd ../data-logistics-service
-  # - cp dags/* ../airflow/dags
-  # - cp -r plugins/* ../airflow/plugins
-  # - cp config/* ../airflow/config
-  # - cp templates/* ../airflow/templates
-  # - echo -e "AIRFLOW_UID=$(id -u)" > /home/maria/data-logistics-service/dockers/.env
-  # - export AIRFLOW_UID=$(id -u)
-  # - echo "Collecting requirements"
-  # - reqs=`cat requirements.txt | tr '\n' ' '`
-  # - echo "Collected - $reqs"
-  # - sudo sh -c "echo \"_PIP_ADDITIONAL_REQUIREMENTS=$reqs\" >> /home/maria/data-logistics-service/dockers/.env"
-  # - pip install -r requirements.txt
-  # - echo "Bringing up the docker containers"
-  # - docker-compose -f ./dockers/docker-compose.yaml --project-directory ../airflow --verbose up airflow-init
-  # - docker-compose -f ./dockers/docker-compose.yaml --project-directory ../airflow up -d
-  - sudo -u mpetrova /bin/bash ./scripts/deployment.sh /home/mpetrova /home/mpetrova/data-logistics-service
+  - sudo -u airflow /bin/bash ./scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service
 
 final_message: "The system is finally up, after $UPTIME seconds"

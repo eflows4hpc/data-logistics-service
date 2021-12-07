@@ -6,19 +6,23 @@ variables:
   OS_IDENTITY_API_VERSION: 3
   OS_REGION_NAME: "HDFCloud"
   OS_INTERFACE: public
-  FLOATING_IP: 134.94.199.220
+  TEST_IP: 134.94.199.220
   OLD_TEST_NAME: old-airflow-test
   TESTING_NAME: airflow-testing
+  TESTING_URL: http://134.94.199.220:7001/home
 
 # before script copied from gitlab docs
-before_script:
+before_script: &ssh_setup
   - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client gcc libxslt-dev libffi-dev libssl-dev build-essential python3-dev -y )'
+  - eval $(ssh-agent -s)
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
 
 stages:
   - test
-  - build
-  - publish
   - deploy
+  - test-deployment
   - cleanup
 
 test:
@@ -43,8 +47,9 @@ test:
 full-deploy-test:
   stage: deploy
   environment: Testing
-  when: manual
-
+  # when: manual
+  only:
+    - web
   script:
     - echo "Starting the full testing deployment of airflows example."
     - pip install python-openstackclient
@@ -52,17 +57,42 @@ full-deploy-test:
     - openstack server set --name $OLD_TEST_NAME $OLD_ID
     - INSTANCE_ID=`openstack server create -f value -c id --prefix IMAGE_ --flavor m4 --image 149a65b5-aeb8-499f-aaa6-ec966bd28dd6 --user-data scripts/cloudinit.yml --security-group ssh --security-group airflows --security-group www --security-group https $TESTING_NAME`
     - while [ "`openstack server show $INSTANCE_ID -c addresses -f value`" = "{}" ]; do sleep 5; done # wait until an address is available to attach the floating ip
-    - openstack server add floating ip $INSTANCE_ID $FLOATING_IP
+    - openstack server add floating ip $INSTANCE_ID $TEST_IP
     - echo "Done"
+
+test-testing_webserver:
+  cache: {}
+  stage: test-deployment 
+  # only:
+  #   - master
+  except:
+    - tags
+  script:
+    - apt update && apt -y install curl
+    - echo "For now, this will be a basic health check i.e. GET / and check for 2xx code."
+    - sleep 150 # ensure that the docker containers are up and running before testing the airflow installation
+    - 'curl --insecure -I -H "Accept: application/json" $TESTING_URL'
+
+test-testing_dags:
+  cache: {}
+  stage: test-deployment 
+  # only:
+  #   - master
+  except:
+    - tags
+  <<: *ssh_setup
+  script:
+    - echo "This is a simple check if the deploments was successful and dags get executed"
+    - sleep 150 # ensure that the docker containers are up and running before testing the airflow installation
+    - ssh airflow@$TEST_IP "airflow db init && airflow dags list && airflow connections list"
+    - ssh airflow@$TEST_IP "airflow dags test testdag 2021-08-18"
 
 cleanup-successful-full-deployment:
   # check if there is an old prod or test instance, and delete it if present
   stage: cleanup
   when: on_success
-  # only:
-  #   - web
-  dependencies:
-    - full-deploy-test
+  only:
+    - web
   script:
     - echo "This is the cleanup for the full-redeployment of the testing or production servers"
     - echo "if this job is reached, all earlier jobs were successful, and any lingering old instances need to be removed"

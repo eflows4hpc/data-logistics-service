@@ -19,8 +19,8 @@ echo "DEBUG_2 $0 $1 $2 $3 $4"
 echo "DEBUG values: OLD_DIR=$OLD_DIR, ENTRYPOINT_DIR=$ENTRYPOINT and GIT_REPO=$GIT_REPO"
 
 cd $ENTRYPOINT
-mkdir -p airflow
-cd airflow
+mkdir -p airflow_proj
+cd airflow_proj
 AIRFLOW_DIR=`pwd`
 #DEBUG prints
 echo "Project dir is set to: $AIRFLOW_DIR"
@@ -37,9 +37,10 @@ cp templates/* $AIRFLOW_DIR/templates
 echo -e "AIRFLOW_UID=$(id -u)" > $GIT_REPO/dockers/.env
 export AIRFLOW_UID=$(id -u)
 echo "Collecting requirements"
-reqs=`cat requirements.txt | tr '\n' ' '`
+reqs=`cat $GIT_REPO/requirements.txt | tr '\n' ' '`
 echo "Collected requirements: $reqs"
-sudo sh -c "echo \"_PIP_ADDITIONAL_REQUIREMENTS=$reqs\" >> $GIT_REPO/dockers/.env"
+# sudo sh -c "echo \"_PIP_ADDITIONAL_REQUIREMENTS=\"$reqs\"\" >> $GIT_REPO/dockers/.env"
+echo "_PIP_ADDITIONAL_REQUIREMENTS=\"$reqs\"" >> $GIT_REPO/dockers/.env
 pip install -r $GIT_REPO/requirements.txt
 
 # sed -i "s_datacatalog.fz-juelich.de_${SERVER_DOMAIN}_g" docker-compose.yml
