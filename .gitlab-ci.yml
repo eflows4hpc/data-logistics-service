@@ -80,12 +80,12 @@ test-testing_dags:
   #   - master
   except:
     - tags
-  <<: *ssh_setup
   script:
     - echo "This is a simple check if the deploments was successful and dags get executed"
     - sleep 150 # ensure that the docker containers are up and running before testing the airflow installation
-    - ssh airflow@$TEST_IP "airflow db init && airflow dags list && airflow connections list"
-    - ssh airflow@$TEST_IP "airflow dags test testdag 2021-08-18"
+    - 'curl -X GET -u airflow:airflow -H "Content-Type: application/json" $TEST_IP:7001/api/v1/dags'
+    - 'curl -X GET -u airflow:airflow -H "Content-Type: application/json" $TEST_IP:7001/api/v1/connections'
+    - 'curl -X POST -u airflow:airflow -H "Content-Type: application/json" --data {} $TEST_IP:7001/api/v1/dags/testdag/dagRuns'
 
 cleanup-successful-full-deployment:
   # check if there is an old prod or test instance, and delete it if present
