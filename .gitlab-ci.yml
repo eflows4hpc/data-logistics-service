@@ -60,19 +60,6 @@ full-deploy-test:
     - openstack server add floating ip $INSTANCE_ID $TEST_IP
     - echo "Done"
 
-test-testing_webserver:
-  cache: {}
-  stage: test-deployment 
-  # only:
-  #   - master
-  except:
-    - tags
-  script:
-    - apt update && apt -y install curl
-    - echo "For now, this will be a basic health check i.e. GET / and check for 2xx code."
-    - sleep 150 # ensure that the docker containers are up and running before testing the airflow installation
-    - 'curl --insecure -I -H "Accept: application/json" $TESTING_URL'
-
 test-testing_dags:
   cache: {}
   stage: test-deployment 
@@ -81,8 +68,10 @@ test-testing_dags:
   except:
     - tags
   script:
+    - apt update && apt -y install curl
     - echo "This is a simple check if the deploments was successful and dags get executed"
     - sleep 150 # ensure that the docker containers are up and running before testing the airflow installation
+    - 'curl --insecure -I -H "Accept: application/json" $TESTING_URL'
     - 'curl -X GET -u airflow:airflow -H "Content-Type: application/json" $TEST_IP:7001/api/v1/dags'
     - 'curl -X GET -u airflow:airflow -H "Content-Type: application/json" $TEST_IP:7001/api/v1/connections'
     - 'curl -X POST -u airflow:airflow -H "Content-Type: application/json" --data {} $TEST_IP:7001/api/v1/dags/testdag/dagRuns'
