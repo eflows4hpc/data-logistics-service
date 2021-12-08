@@ -10,6 +10,7 @@ variables:
   OLD_TEST_NAME: old-airflow-test
   TESTING_NAME: airflow-testing
   TESTING_URL: http://134.94.199.220:7001/home
+  AIRFLOW_TESTUSER: "airflow"
 
 # before script copied from gitlab docs
 before_script: &ssh_setup
@@ -47,7 +48,6 @@ test:
 full-deploy-test:
   stage: deploy
   environment: Testing
-  # when: manual
   only:
     - web
   script:
@@ -63,18 +63,18 @@ full-deploy-test:
 test-testing_dags:
   cache: {}
   stage: test-deployment 
-  # only:
-  #   - master
+  only:
+    - web # and master
   except:
     - tags
   script:
     - apt update && apt -y install curl
     - echo "This is a simple check if the deploments was successful and dags get executed"
-    - sleep 150 # ensure that the docker containers are up and running before testing the airflow installation
+    - sleep 60 # ensure that the docker containers are up and running before testing the airflow installation
     - 'curl --insecure -I -H "Accept: application/json" $TESTING_URL'
-    - 'curl -X GET -u airflow:airflow -H "Content-Type: application/json" $TEST_IP:7001/api/v1/dags'
-    - 'curl -X GET -u airflow:airflow -H "Content-Type: application/json" $TEST_IP:7001/api/v1/connections'
-    - 'curl -X POST -u airflow:airflow -H "Content-Type: application/json" --data {} $TEST_IP:7001/api/v1/dags/testdag/dagRuns'
+    - 'curl -X GET -u $AIRFLOW_TESTUSER:$AIRFLOW_TESTUSER_PASS -H "Content-Type: application/json" $TEST_IP:7001/api/v1/dags'
+    - 'curl -X GET -u $AIRFLOW_TESTUSER:$AIRFLOW_TESTUSER_PASS -H "Content-Type: application/json" $TEST_IP:7001/api/v1/connections'
+    - 'curl -X POST -u $AIRFLOW_TESTUSER:$AIRFLOW_TESTUSER_PASS -H "Content-Type: application/json" --data {} $TEST_IP:7001/api/v1/dags/testdag/dagRuns'
 
 cleanup-successful-full-deployment:
   # check if there is an old prod or test instance, and delete it if present
