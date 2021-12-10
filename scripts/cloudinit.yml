@@ -40,7 +40,7 @@ users:
 
   - name: airflow
     gecos: Common user for running the airflow services
-    groups: sudo
+    groups: sudo, docker
     sudo: ALL=(ALL) NOPASSWD:ALL
     lock_passwd: true
     ssh_authorized_keys:
