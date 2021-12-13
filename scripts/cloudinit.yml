@@ -12,7 +12,8 @@ packages:
   - python3
   - python3-pip
   - docker.io
-  - docker-compose
+  # apt-get of ubuntu 20.04 LTS does not install the newest version of docker-compose.
+  # - docker-compose
 
 # Add users to the system. Users are added after groups are added.
 
@@ -47,17 +48,26 @@ users:
   #     - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDQMbfKUO3NoZspgWpzFY+SwY5Tx251oBT/F22pmnqKq3A0U1EcRooYVc11HzDmLrDTkoLSWAYPuv7I8weKqUPMlypXygu7I1kw1JoAZ4veV/TO8kBIb8+fUjD4VnD0EuU9/MD4rc0IazlInUu/5H2oDj4cj3XGoOFHAPRvo1YXF2eEbXgHcos5o52idZfvZPeWmk4wLqWUI+4q1C5o+c9xGxdWkA0Z6cErw5jSfaqIMu9GnsaPE8dDZ89vtNu8kRK97/Ax0qmJ8eLBfv3qm2HnqACRUv1MRLS/s9KsdB18DV6dTn8VuErJsn9rlpx/2oEMVS5lkUSLTJHf7oNVKDtILQ/rQ2tF/f3LakmiViA4ZsWxFspP0T/sXPhjuCgEqGWG8HrJwFj8DByMpoJUsGe1czAiMdoY5Tr7UeIgK7BGaGjoVUFaVrCKlDpDNhYsHopSTTNajVxsb0LkTRIRphGlQTHlD3nDYdHIrgZiLqA1XLtTTXtWNzQ4uE59tAkIzdTK7RSBduHunqx++IEO6Huj49Vvk1vcO33iqFTTZro1vhZ2kEGxAkxNMti+/eT2rvyfkhsXaUH1/7LXvRrR+pFKcXBpaWWeEt8cOiVrMWAPDi9VRh5QPZbJ1tyTq7XzxeaQuJhL22o2BO13ZSRzr1S+UNFcmfk3esruZoxDIiQ+Bw== apiserver@gitlab
 
 runcmd:
+  - sudo pip3 install docker-compose
   - 'git clone https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service.git /home/maria/data-logistics-service'
   - cd /home/maria
   - mkdir airflow
   - cd airflow
   - mkdir -p ./dags ./logs ./plugins ./config ./templates
-  - cp ../data-logistics-service/dags/* ./dags
-  - cp -r ../data-logistics-service/plugins/* ./plugins
-  - cp ../data-logistics-service/config/* ./config
-  - cp ../data-logistics-service/templates/* ./templates
-  - echo -e "AIRFLOW_UID=$(id -u)" > ../data-logistics-service/dockers/.env #for root
+  - cd ../data-logistics-service
+  - cp dags/* ../airflow/dags
+  - cp -r plugins/* ../airflow/plugins
+  - cp config/* ../airflow/config
+  - cp templates/* ../airflow/templates
+  # - echo -e "AIRFLOW_UID=$(id -u)" > ../data-logistics-service/dockers/.env #for root
   - export AIRFLOW_UID=$(id -u)
-  - docker-compose -f ~/data-logistics-service/dockers/docker-compose.yaml --project-directory ~/airflow --verbose up airflow-init
-  - docker-compose -f ~/data-logistics-service/dockers/docker-compose.yaml --project-directory ~/airflow . up
-  # - /bin/bash ../data-logistics-service/scripts/deployment.sh .
+  - echo "Collecting requirements"
+  - reqs=`cat requirements.txt | tr '\n' ' '`
+  - echo "Collected -> $reqs"
+  - sudo sh -c "echo \"_PIP_ADDITIONAL_REQUIREMENTS=$reqs\" >> /home/maria/data-logistics-service/dockers/.env"
+  - echo "Bringing up the docker containers"
+  - docker-compose -f ./dockers/docker-compose.yaml --project-directory ../airflow --verbose up airflow-init
+  - docker-compose -f ./dockers/docker-compose.yaml --project-directory ../airflow up -d
+  # - /bin/bash ./scripts/deployment.sh .
+
+final_message: "The system is finally up, after $UPTIME seconds"
