@@ -26,8 +26,8 @@ def conn_decorator():
         rrid = kwargs['run_id']
         host = params.get('host')
         port = params.get('port', 2222)
-        key = params.get('key')
         user = params.get('login', 'eflows')
+        key = params.get('key')
 
         conn_id = f"tmp_connection_{rrid}"
         extra = {"private_key": key}
