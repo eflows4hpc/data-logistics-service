@@ -4,3 +4,5 @@ plyvel
 apache-airflow-providers-ssh
 apache-airflow-providers-http
 apache-airflow-providers-sftp
+--index-url https://gitlab.jsc.fz-juelich.de/api/v4/projects/4405/packages/pypi/simple
+airflow-datacat-integration>=0.0.4
