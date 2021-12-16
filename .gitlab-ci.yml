@@ -30,6 +30,24 @@ test:
    - airflow dags test testdag 2021-08-18
    - nosetests
 
+build-custom-image:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  when: manual
+  variables:
+    IMAGE_COMMIT_TAG: $CI_REGISTRY_IMAGE/eflows-airflow:$CI_COMMIT_SHORT_SHA
+    IMAGE_LATEST_TAG: $CI_REGISTRY_IMAGE/eflows-airflow:latest
+
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build --no-cache=true --pull -t $IMAGE_COMMIT_TAG -f dockers/eflows-airflow.docker .
+    - docker push $IMAGE_COMMIT_TAG
+    - docker tag $IMAGE_COMMIT_TAG $IMAGE_LATEST_TAG
+    - docker push $IMAGE_LATEST_TAG
+
+
 deploy-test:
   stage: deploy
   environment: Testing
@@ -40,6 +58,9 @@ deploy-test:
     OS_IDENTITY_API_VERSION: 3
     OS_REGION_NAME: "HDFCloud"
     OS_INTERFACE: public
+    # TODO set proepr values for env variable - need to pass those values to the machine (alternatively edit airflow.cfg only inside the machine)
+    AIRFLOW__SECRETS__BACKEND_KWARGS: '{\"url\" : \"https://zam10036.zam.kfa-juelich.de\", \"user\" : \"${DATACAT_TESTING_USERNAME}\", \"password\" : \"${DATACAT_TESTING_PASSWORD}\"}\' 
+    AIRFLOW__SECRETS__BACKEND: datacat_integration.secrets.DatacatSecretsBackend
     FLOATING_IP: 134.94.199.220
   script:
     - echo "Starting the full testing deployment of airflows example."
