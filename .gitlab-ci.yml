@@ -13,12 +13,13 @@ variables:
   AIRFLOW_TESTUSER: "airflow"
 
 # before script copied from gitlab docs
-before_script: &ssh_setup
-  - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client gcc libxslt-dev libffi-dev libssl-dev build-essential python3-dev -y )'
-  - eval $(ssh-agent -s)
-  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-  - mkdir -p ~/.ssh
-  - chmod 700 ~/.ssh
+.before_script_template: &ssh_setup
+  before_script:
+    - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client gcc libxslt-dev libffi-dev libssl-dev build-essential python3-dev -y )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
 
 stages:
   - test
@@ -70,9 +71,9 @@ test-testing_dags:
   script:
     - apt update && apt -y install curl
     - echo "This is a simple check if the deployment was successful and dags get executed"
-    # ensure that the docker containers are up and running before testing the airflow installation; it should take no longer than about 16 minutes for the containers to be up and running
+    # ensure that the docker containers are up and running before testing the airflow deployment; timeout in 16 to 17 minutes
     - SECONDS=0
-    - while [ $SECONDS -le 1000 ] ; do if output=$(curl --insecure -I -H "Accept: application/json" $TESTING_URL) ; then break; else sleep 30; fi ; done
+    - 'while [ $SECONDS -le 1000 ] ; do if output=$(curl --insecure --max-time 10 -I -H "Accept: application/json" $TESTING_URL) ; then break; else sleep 30; fi ; done'
     - 'curl --insecure -I -H "Accept: application/json" $TESTING_URL'
     - 'curl -X GET -u $AIRFLOW_TESTUSER:$AIRFLOW_TESTUSER_PASS -H "Content-Type: application/json" $TESTING_IP:7001/api/v1/dags'
     - 'curl -X GET -u $AIRFLOW_TESTUSER:$AIRFLOW_TESTUSER_PASS -H "Content-Type: application/json" $TESTING_IP:7001/api/v1/connections'
