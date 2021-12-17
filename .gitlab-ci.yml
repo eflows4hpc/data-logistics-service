@@ -6,7 +6,7 @@ variables:
   OS_IDENTITY_API_VERSION: 3
   OS_REGION_NAME: "HDFCloud"
   OS_INTERFACE: public
-  TEST_IP: 134.94.199.220
+  TESTING_IP: 134.94.199.220
   OLD_TEST_NAME: old-airflow-test
   TESTING_NAME: airflow-testing
   TESTING_URL: http://134.94.199.220:7001/home
@@ -57,7 +57,7 @@ full-deploy-test:
     - openstack server set --name $OLD_TEST_NAME $OLD_ID
     - INSTANCE_ID=`openstack server create -f value -c id --prefix IMAGE_ --flavor m4 --image 149a65b5-aeb8-499f-aaa6-ec966bd28dd6 --user-data scripts/cloudinit.yml --security-group ssh --security-group airflows --security-group www --security-group https $TESTING_NAME`
     - while [ "`openstack server show $INSTANCE_ID -c addresses -f value`" = "{}" ]; do sleep 5; done # wait until an address is available to attach the floating ip
-    - openstack server add floating ip $INSTANCE_ID $TEST_IP
+    - openstack server add floating ip $INSTANCE_ID $TESTING_IP
     - echo "Done"
 
 test-testing_dags:
@@ -69,12 +69,14 @@ test-testing_dags:
     - tags
   script:
     - apt update && apt -y install curl
-    - echo "This is a simple check if the deploments was successful and dags get executed"
-    - sleep 60 # ensure that the docker containers are up and running before testing the airflow installation
+    - echo "This is a simple check if the deployment was successful and dags get executed"
+    # ensure that the docker containers are up and running before testing the airflow installation; it should take no longer than about 16 minutes for the containers to be up and running
+    - SECONDS=0
+    - while [ $SECONDS -le 1000 ] ; do if output=$(curl --insecure -I -H "Accept: application/json" $TESTING_URL) ; then break; else sleep 30; fi ; done
     - 'curl --insecure -I -H "Accept: application/json" $TESTING_URL'
-    - 'curl -X GET -u $AIRFLOW_TESTUSER:$AIRFLOW_TESTUSER_PASS -H "Content-Type: application/json" $TEST_IP:7001/api/v1/dags'
-    - 'curl -X GET -u $AIRFLOW_TESTUSER:$AIRFLOW_TESTUSER_PASS -H "Content-Type: application/json" $TEST_IP:7001/api/v1/connections'
-    - 'curl -X POST -u $AIRFLOW_TESTUSER:$AIRFLOW_TESTUSER_PASS -H "Content-Type: application/json" --data {} $TEST_IP:7001/api/v1/dags/testdag/dagRuns'
+    - 'curl -X GET -u $AIRFLOW_TESTUSER:$AIRFLOW_TESTUSER_PASS -H "Content-Type: application/json" $TESTING_IP:7001/api/v1/dags'
+    - 'curl -X GET -u $AIRFLOW_TESTUSER:$AIRFLOW_TESTUSER_PASS -H "Content-Type: application/json" $TESTING_IP:7001/api/v1/connections'
+    - 'curl -X POST -u $AIRFLOW_TESTUSER:$AIRFLOW_TESTUSER_PASS -H "Content-Type: application/json" --data {} $TESTING_IP:7001/api/v1/dags/testdag/dagRuns'
 
 cleanup-successful-full-deployment:
   # check if there is an old prod or test instance, and delete it if present
@@ -87,3 +89,28 @@ cleanup-successful-full-deployment:
     - echo "if this job is reached, all earlier jobs were successful, and any lingering old instances need to be removed"
     - pip install python-openstackclient
     - openstack server delete $OLD_TEST_NAME && echo "Deleted old testing server." || echo "No old testing server found."
+
+cleanup-failed-full-deployment:
+  # check if there is an old prod or test instance, assign respective ip to it, re-attach volume, delete new instance, rename old instance
+  # if there is none, this is a failed light-deployment, which is handled by another job
+  # this does not guarantee a successful rollback, but unless the old instance was faulty, this should work
+  stage: cleanup
+  when: on_failure
+  only:
+    - web
+  <<: *ssh_setup
+  script:
+    - echo "This is the cleanup for the full-redeployment of the testing or production servers"
+    - echo "if this job is reached, some earlier job had to have failed, this will return to the previous instance (if available)"
+    - echo "A successfull cleanup can not be guaranteed, depending on the failure reason"
+    - pip install python-openstackclient
+    # check which old instance is present. (either old test or old production); store instance id in a var
+    - OLD_TEST_ID=`openstack server show $OLD_TEST_NAME -f value -c id` && rollback_test=true || echo "No old testing server found."
+    # if applicable: rollback test server
+    - if [ "$rollback_test" = true ] ; then 
+      REMOVE_ID=`openstack server show $TESTING_NAME -f value -c id`;
+      openstack server set --name $TESTING_NAME $OLD_TEST_ID;
+      openstack server add floating ip $OLD_TEST_ID $TESTING_IP;
+      openstack server delete $REMOVE_ID && echo "Deleted faulty testing server.";
+      fi
+    # gitlab should automatically alert the devs about this failure
