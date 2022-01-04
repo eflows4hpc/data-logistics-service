@@ -16,10 +16,7 @@ test:
   image: 
     name: apache/airflow:2.1.3
     entrypoint: [""]
-  variables:
-    AIRFLOW__SECRETS__BACKEND_KWARGS: '{"url" : "https://zam10036.zam.kfa-juelich.de", "user" : "${DATACAT_TESTING_USERNAME}", "password" : "${DATACAT_TESTING_PASSWORD}"}'
   before_script:
-    - echo $AIRFLOW__SECRETS__BACKEND_KWARGS
     - airflow db init
     - pip install -r requirements.txt
     - pip install nose==1.3.7
@@ -61,8 +58,7 @@ deploy-test:
     OS_IDENTITY_API_VERSION: 3
     OS_REGION_NAME: "HDFCloud"
     OS_INTERFACE: public
-    # TODO set proepr values for env variable - need to pass those values to the machine (alternatively edit airflow.cfg only inside the machine)
-    AIRFLOW__SECRETS__BACKEND_KWARGS: '{\"url\" : \"https://zam10036.zam.kfa-juelich.de\", \"user\" : \"${DATACAT_TESTING_USERNAME}\", \"password\" : \"${DATACAT_TESTING_PASSWORD}\"}\' 
+    AIRFLOW__SECRETS__BACKEND_KWARGS: '{"url" : "https://zam10036.zam.kfa-juelich.de", "user" : "${DATACAT_TESTING_USERNAME}", "password" : "${DATACAT_TESTING_PASSWORD}"}'
     AIRFLOW__SECRETS__BACKEND: datacat_integration.secrets.DatacatSecretsBackend
     FLOATING_IP: 134.94.199.220
   script:
