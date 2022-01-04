@@ -17,7 +17,7 @@ test:
     name: apache/airflow:2.1.3
     entrypoint: [""]
   variables:
-    - AIRFLOW__SECRETS__BACKEND_KWARGS: '{\"url\" : \"https://zam10036.zam.kfa-juelich.de\", \"user\" : \"${DATACAT_TESTING_USERNAME}\", \"password\" : \"${DATACAT_TESTING_PASSWORD}\"}\' 
+    - AIRFLOW__SECRETS__BACKEND_KWARGS: '{"url" : "https://zam10036.zam.kfa-juelich.de", "user" : "${DATACAT_TESTING_USERNAME}", "password" : "${DATACAT_TESTING_PASSWORD}"}'
   before_script:
     - echo $AIRFLOW__SECRETS__BACKEND_KWARGS
     - airflow db init
