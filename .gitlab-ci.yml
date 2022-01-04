@@ -17,6 +17,8 @@ test:
     name: apache/airflow:2.1.3
     entrypoint: [""]
   before_script:
+    - echo "DEBUG:"
+    - pip --version
     - airflow db init
     - pip install -r requirements.txt
     - pip install nose==1.3.7
