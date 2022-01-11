@@ -3,6 +3,7 @@ dockers/.env
 .vscode/*
 *.pyc
 logs/
+.env
 
 # contains data for local tests
 .coverage

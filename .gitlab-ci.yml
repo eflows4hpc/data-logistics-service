@@ -39,11 +39,13 @@ build-custom-image:
     - docker:dind
   when: manual
   variables:
-    IMAGE_COMMIT_TAG: $CI_REGISTRY_IMAGE/eflows-airflow:$CI_COMMIT_SHORT_SHA
-    IMAGE_LATEST_TAG: $CI_REGISTRY_IMAGE/eflows-airflow:latest
+    REGISTRY: registry.jsc.fz-juelich.de
+    REGISTRY_PATH: $REGISTRY/eflows4hpc-wp2/data-logistics-service/eflows-airflow
+    IMAGE_COMMIT_TAG: $REGISTRY_PATH:$CI_COMMIT_SHORT_SHA
+    IMAGE_LATEST_TAG: $REGISTRY_PATH:latest
 
   script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $REGISTRY
     - docker build --no-cache=true --pull -t $IMAGE_COMMIT_TAG -f dockers/eflows-airflow.docker .
     - docker push $IMAGE_COMMIT_TAG
     - docker tag $IMAGE_COMMIT_TAG $IMAGE_LATEST_TAG
