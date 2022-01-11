@@ -39,8 +39,7 @@ build-custom-image:
     - laptop
   services:
     - docker:dind
-  when:
-    - manual
+  when: manual
   variables:
     IMAGE_COMMIT_TAG: $CI_REGISTRY_IMAGE/eflows-airflow:$CI_COMMIT_SHORT_SHA
     IMAGE_LATEST_TAG: $CI_REGISTRY_IMAGE/eflows-airflow:latest
