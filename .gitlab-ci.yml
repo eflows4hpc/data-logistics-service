@@ -16,8 +16,6 @@ test:
   image: 
     name: apache/airflow:2.1.3
     entrypoint: [""]
-  tags:
-    - laptop
   before_script:
     - echo "DEBUG:"
     - pip --version
@@ -37,8 +35,12 @@ test:
 build-custom-image:
   stage: build
   image: docker:latest
+  tags:
+    - laptop
   services:
     - docker:dind
+  when:
+    - manual
   variables:
     IMAGE_COMMIT_TAG: $CI_REGISTRY_IMAGE/eflows-airflow:$CI_COMMIT_SHORT_SHA
     IMAGE_LATEST_TAG: $CI_REGISTRY_IMAGE/eflows-airflow:latest
