@@ -16,6 +16,8 @@ test:
   image: 
     name: apache/airflow:2.1.3
     entrypoint: [""]
+  tags:
+    - laptop
   before_script:
     - echo "DEBUG:"
     - pip --version
