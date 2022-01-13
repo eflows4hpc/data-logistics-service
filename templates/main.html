@@ -1,3 +1,4 @@
+ 
 {#
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements.  See the NOTICE file
@@ -18,7 +19,7 @@
 #}
 
 {% extends 'appbuilder/baselayout.html' %}
-{% from 'airflow/_messages.html' import message %}
+{% from 'airflow/_messages.html' import show_message %}
 
 {% block page_title -%}
   {% if title is defined -%}
@@ -52,7 +53,7 @@
 {% block messages %}
   {% include 'appbuilder/flash.html' %}
   {% if scheduler_job is defined and (not scheduler_job or not scheduler_job.is_alive()) %}
-    {% call message(category='warning', dismissable=false) %}
+    {% call show_message(category='warning', dismissible=false) %}
       <p>The scheduler does not appear to be running.
       {% if scheduler_job %}
       Last heartbeat was received
@@ -67,7 +68,7 @@
     {% endcall %}
   {% endif %}
   {% if triggerer_job is defined and (not triggerer_job or not triggerer_job.is_alive()) %}
-    {% call message(category='warning', dismissable=false) %}
+    {% call show_message(category='warning', dismissible=false) %}
       <p>The triggerer does not appear to be running.
       {% if triggerer_job %}
       Last heartbeat was received
@@ -143,6 +144,7 @@
     var csrfToken = '{{ csrf_token() }}';
     $('time[title]').tooltip();
   </script>
+  <!-- CUSTOM FOOTER SCRIPT -->
   <!-- Calculate the size of the dynamic footer to make sure that it doesn't cover the content of the page. Helps also on mobile devices. -->
   <script>
     function footerAlign() {

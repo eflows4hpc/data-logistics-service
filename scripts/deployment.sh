@@ -2,7 +2,7 @@
 # @author Maria Petrova & Christian Böttcher
 ## USAGE:
 #
-# deployment.sh <project_directory> <git_directory> [API_URL] [SERVER_DOMAIN]
+# deployment.sh <user_home_directory> <git_directory> [API_URL] [SERVER_DOMAIN]
 
 OLD_DIR=`pwd`
 GIT_REPO=$HOME/data-logistics-service
@@ -19,8 +19,8 @@ echo "DEBUG_2 $0 $1 $2 $3 $4"
 echo "DEBUG values: OLD_DIR=$OLD_DIR, ENTRYPOINT_DIR=$ENTRYPOINT and GIT_REPO=$GIT_REPO"
 
 cd $ENTRYPOINT
-mkdir -p airflow_proj
-cd airflow_proj
+mkdir -p eflows-airflow
+cd eflows-airflow
 AIRFLOW_DIR=`pwd`
 #DEBUG prints
 echo "Project dir is set to: $AIRFLOW_DIR"

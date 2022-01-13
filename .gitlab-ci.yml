@@ -46,7 +46,7 @@ test:
    - airflow dags test testdag 2021-08-18
    - nosetests
 
-full-deploy-test:
+full-deploy-testing:
   stage: deploy
   environment: Testing
   only:
@@ -60,6 +60,22 @@ full-deploy-test:
     - while [ "`openstack server show $INSTANCE_ID -c addresses -f value`" = "{}" ]; do sleep 5; done # wait until an address is available to attach the floating ip
     - openstack server add floating ip $INSTANCE_ID $TESTING_IP
     - echo "Done"
+
+# TODO test light deployment
+light-deploy-testing:
+  stage: deploy
+  # only run when master is updated, unless the pipeline was triggered via the web UI
+  only:
+    - master
+    - mptest
+  except:
+    - tags
+    - web
+  <<: *ssh_setup
+  environment: Testing
+  script:
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "cd /home/airflow/data-logistics-service && sudo git stash && sudo git pull --all && sudo git checkout -f $CI_COMMIT_TAG && sudo git stash clear"
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service"
 
 test-testing_dags:
   cache: {}
