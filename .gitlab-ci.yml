@@ -60,6 +60,5 @@ publishgit-do:
     - (git remote rm gith) || echo "Not found"
     - (git remote -v | grep gith) || git remote add gith "https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/eflows4hpc/data-logistics-service.git"
     - git remote -v
-    - git show-ref
-    - export
+    - git fetch --unshallow origin
     - git push gith $CI_COMMIT_REF_NAME
