@@ -89,4 +89,4 @@ publishgit-do:
     - (git remote -v | grep gith) || git remote add gith "https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/eflows4hpc/data-logistics-service.git"
     - git remote -v
     - git fetch --unshallow origin
-    - git push gith $CI_COMMIT_REF_NAME
+    - git push gith +$CI_COMMIT_REF_NAME:refs/heads/main
