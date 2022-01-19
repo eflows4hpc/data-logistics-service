@@ -37,7 +37,7 @@ stages:
 test:
   stage: test
   image: 
-    name: apache/airflow:2.2.3
+    name: registry.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service/eflows-airflow
     entrypoint: [""]
   before_script:
     - echo "DEBUG:"
