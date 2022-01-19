@@ -12,8 +12,8 @@ variables:
   TESTING_NAME: airflow-testing
   TESTING_URL: http://134.94.199.220:7001/home
   AIRFLOW_TESTUSER: "airflow"
-  # AIRFLOW__SECRETS__BACKEND_KWARGS: '{"url" : "https://zam10036.zam.kfa-juelich.de", "user" : "${DATACAT_TESTING_USERNAME}", "password" : "${DATACAT_TESTING_PASSWORD}"}'
-  # AIRFLOW__SECRETS__BACKEND: datacat_integration.secrets.DatacatSecretsBackend
+  AIRFLOW__SECRETS__BACKEND_KWARGS: '{"url" : "https://zam10036.zam.kfa-juelich.de", "user" : "${DATACAT_TESTING_USERNAME}", "password" : "${DATACAT_TESTING_PASSWORD}"}'
+  AIRFLOW__SECRETS__BACKEND: datacat_integration.secrets.DatacatSecretsBackend
   DOCKER_TLS_CERTDIR: ""
 
 
@@ -37,8 +37,7 @@ stages:
 test:
   stage: test
   image: 
-    name: apache/airflow:2.2.3
-    # name: registry.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service/eflows-airflow
+    name: $CI_REGISTRY_IMAGE/eflows-airflow:latest
     entrypoint: [""]
   before_script:
     - echo "DEBUG:"
