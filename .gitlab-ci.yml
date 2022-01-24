@@ -108,7 +108,7 @@ light-deploy-testing:
   <<: *ssh_setup
   environment: Testing
   script:
-    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "cd /home/airflow/data-logistics-service && sudo git stash && sudo git pull --all && sudo git checkout -f $CI_COMMIT_TAG && sudo git stash clear"
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "cd /home/airflow/data-logistics-service && sudo git stash && sudo git stash clear && sudo git checkout main && sudo git checkout -f $CI_COMMIT_TAG && sudo git pull --all"
     - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $TESTING_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS"
 
 test-testingdeployment_webserver:
