@@ -101,8 +101,7 @@ light-deploy-testing:
   stage: deploy
   # only run when master is updated, unless the pipeline was triggered via the web UI
   only:
-    - master
-    - mptest
+    - main
   except:
     - tags
     - web
