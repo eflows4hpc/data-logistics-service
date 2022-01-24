@@ -53,6 +53,6 @@ runcmd:
   - echo "Current user is $(whoami)"
   - sudo -u airflow git clone https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service.git ./data-logistics-service
   - cd ./data-logistics-service
-  - sudo -u airflow /bin/bash ./scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service
+  - touch /finished_cloudinit
 
 final_message: "The system is finally up, after $UPTIME seconds"

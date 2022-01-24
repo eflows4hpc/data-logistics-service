@@ -11,6 +11,7 @@ variables:
   OLD_TEST_NAME: old-airflow-test
   TESTING_NAME: airflow-testing
   TESTING_URL: http://134.94.199.220:7001/home
+  TESTING_DOMAIN: zam10220.zam.kfa-juelich.de
   AIRFLOW_TESTUSER: "airflow"
   AIRFLOW__SECRETS__BACKEND_KWARGS: '{"url" : "https://zam10036.zam.kfa-juelich.de", "user" : "${DATACAT_TESTING_USERNAME}", "password" : "${DATACAT_TESTING_PASSWORD}"}'
   AIRFLOW__SECRETS__BACKEND: datacat_integration.secrets.DatacatSecretsBackend
@@ -89,6 +90,9 @@ deploy-testing:
     - INSTANCE_ID=`openstack server create -f value -c id --prefix IMAGE_ --flavor m4 --image 149a65b5-aeb8-499f-aaa6-ec966bd28dd6 --user-data scripts/cloudinit.yml --security-group ssh --security-group airflows --security-group www --security-group https $TESTING_NAME`
     - while [ "`openstack server show $INSTANCE_ID -c addresses -f value`" = "{}" ]; do sleep 5; done # wait until an address is available to attach the floating ip
     - openstack server add floating ip $INSTANCE_ID $TESTING_IP
+    - sleep 10 # ensure that next command reaches the new server, prevents host key problems
+    - until ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP ls /finished_cloudinit >/dev/null 2>&1; do sleep 30; done # wait until cloudinit script is complete
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $TESTING_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS"
     - echo "Done"
 
 # NOTE Light deployment did not perform well when the template/main.html file was changed (in case of the official airflow image being updated)
@@ -106,7 +110,7 @@ light-deploy-testing:
   environment: Testing
   script:
     - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "cd /home/airflow/data-logistics-service && sudo git stash && sudo git pull --all && sudo git checkout -f $CI_COMMIT_TAG && sudo git stash clear"
-    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service"
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $TESTING_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS"
 
 test-testingdeployment_webserver:
   cache: {}

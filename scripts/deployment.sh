@@ -2,21 +2,23 @@
 # @author Maria Petrova & Christian Böttcher
 ## USAGE:
 #
-# deployment.sh <user_home_directory> <git_directory> [API_URL] [SERVER_DOMAIN]
+# deployment.sh <user_home_directory> <git_directory> [SERVER_DOMAIN] [AIRFLOW__SECRETS__BACKEND] [AIRFLOW__SECRETS__BACKEND_KWARGS]
 
 OLD_DIR=`pwd`
 GIT_REPO=$HOME/data-logistics-service
 
-echo "DEBUG_1 $0 $1 $2 $3 $4"
+echo "DEBUG_1 $0 $1 $2 $3 $4 $5"
 
 #if null (var + trim empty strings)
 if [ -z ${1+x} ]; then ENTRYPOINT=`pwd`; else ENTRYPOINT=$1; fi
 if [ -z ${2+x} ]; then echo "No user input for starting repository location. Default value: $GIT_REPO"; else GIT_REPO=$2; fi
-# if [ -z ${2+x} ]; then API_URL=https://datacatalog.fz-juelich.de/; else API_URL=$2; fi
-# if [ -z ${3+x} ]; then SERVER_DOMAIN=datacatalog.fz-juelich.de; else SERVER_DOMAIN=$3; fi
+if [ -z ${3+x} ]; then SERVER_DOMAIN=dls.fz-juelich.de; else SERVER_DOMAIN=$3; fi
+if [ -z ${3+x} ]; then unset AIRFLOW__SECRETS__BACKEND; else AIRFLOW__SECRETS__BACKEND=$4; fi
+if [ -z ${3+x} ]; then unset AIRFLOW__SECRETS__BACKEND_KWARGS; else AIRFLOW__SECRETS__BACKEND_KWARGS=$5; fi
 
-echo "DEBUG_2 $0 $1 $2 $3 $4"
+echo "DEBUG_2 $0 $1 $2 $3 $4 $5"
 echo "DEBUG values: OLD_DIR=$OLD_DIR, ENTRYPOINT_DIR=$ENTRYPOINT and GIT_REPO=$GIT_REPO"
+echo "DEBUG using secrets backend: $4"
 
 cd $ENTRYPOINT
 mkdir -p eflows-airflow
