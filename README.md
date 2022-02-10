@@ -5,7 +5,7 @@ eFlows4HPC Data Logistics Service
 This work has been supported by the eFlows4HPC project, contract #955558. This project has received funding from the European High-Performance Computing Joint Undertaking (JU) under grant agreement No 955558. The JU receives support from the European Union’s Horizon 2020 research and innovation programme and Spain, Germany, France, Italy, Poland, Switzerland, Norway.
 
 The project has recieved funding from German Federal Ministry of Education and Research agreement no. 16GPC016K.
-![BMBF](docs/images/BMBF.jpg  =250x)
+<img src="docs/images/BMBF.jpg" width="200">
 
 
 ## Install and run
