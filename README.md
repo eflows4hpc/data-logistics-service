@@ -8,6 +8,9 @@ The project has recieved funding from German Federal Ministry of Education and R
 <img src="docs/images/BMBF.jpg" width="200">
 
 
+## Architecture
+Architecture document can be found in [arch](docs/datalogistics-arch.adoc) folder. 
+
 ## Install and run
 
 ```
