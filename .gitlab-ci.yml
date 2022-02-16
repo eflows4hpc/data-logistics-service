@@ -82,6 +82,7 @@ full-deploy-testing:
   environment: Testing
   only: 
     - web
+  <<: *ssh_setup
   script:
     - echo "Starting the full testing deployment of airflows example."
     - pip install python-openstackclient
