@@ -42,6 +42,19 @@ def get_record_template():
                 },
             "open_access": True}
 
+def get_schema(url):
+    r = requests.get(url)
+    return r.json()
+
+def get_community(server, community_id):
+    response = requests.get( url=urljoin(server, f"api/communities/{community_id}"),
+                            headers={'Content-Type':'application/json'}).json()
+    if 'status' in response:
+        return None
+    schema = get_schema(url=response['links']['schema'])
+    return response['id'], schema['json_schema']['allOf'][0]['required']
+
+
 def create_draft_record(server: str, token: str, record):
     response = requests.post( url=urljoin(server, 'api/records/'),
                       headers={'Content-Type':'application/json'},

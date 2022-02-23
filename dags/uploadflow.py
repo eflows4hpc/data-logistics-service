@@ -10,7 +10,7 @@ from airflow.providers.ssh.hooks.ssh import SSHHook
 from airflow.utils.dates import days_ago
 
 from b2shareoperator import (add_file, create_draft_record,
-                             get_record_template, submit_draft)
+                             get_community, submit_draft)
 
 default_args = {
     'owner': 'airflow',
@@ -73,6 +73,24 @@ def upload_example():
 
         return mappings
         
+    def create_template(hrespo):
+        return {
+            "titles" : [{"title": hrespo['title']}],
+            "creators" : [{"creator_name": hrespo['creator_name']}],
+            "descriptions" :[
+                {
+                    "description": hrespo['description'], 
+                    "description_type": "Abstract"
+                }
+                ],
+            "community" : "2d58eb08-af65-4cad-bd25-92f1a17d325b",
+            "community_specific" :{
+                "90942261-4637-4ac0-97b8-12e1edb38739": {"helmholtz centre": ["Forschungszentrum Jülich"]}
+                },
+            "open_access": hrespo['open_access']=="True"
+            }
+
+
 
     @task()
     def upload(files: dict, **kwargs):
@@ -88,22 +106,18 @@ def upload_example():
         hook = HttpHook(http_conn_id='datacat', method='GET')
         hrespo = hook.run(endpoint=f"storage_target/{mid}").json()['metadata']
         print(hrespo)
+        template = create_template(hrespo=hrespo)
+        community = get_community(server=server, community_id=template['community'])
+        if not community:
+            print("Not existing community")
+            return
+        cid, required = community
+        missing = [r for r in required if r not in template]
+        if any(missing):
+            print(f"Community {cid} required field {missing} are missing")
+            return
+
         
-        template = {
-            "titles" : [{"title":hrespo['title']}],
-            "creators" : [{"creator_name": hrespo['creator_name']}],
-            "descriptions" :[
-                {
-                    "description": hrespo['description'], 
-                    "description_type": "Abstract"
-                }
-                ],
-            "community" : "2d58eb08-af65-4cad-bd25-92f1a17d325b",
-            "community_specific" :{
-                "90942261-4637-4ac0-97b8-12e1edb38739": {"helmholtz centre": ["Forschungszentrum Jülich"]}
-                },
-            "open_access": hrespo['open_access']=="True"
-            }
         r = create_draft_record(server=server, token=token, record=template)
         print(r)
         print(f"Draft record created {r['id']} --> {r['links']['self']}")
