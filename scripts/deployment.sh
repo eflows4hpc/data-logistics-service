@@ -31,10 +31,10 @@ echo "Proceeding as user $(whoami)"
 # Make the necessary folders for the airflow artefacts and copy the corresponging content
 mkdir -p ./dags ./logs ./plugins ./config ./templates
 cd $GIT_REPO
-cp dags/* $AIRFLOW_DIR/dags
+cp -r dags/* $AIRFLOW_DIR/dags
 cp -r plugins/* $AIRFLOW_DIR/plugins
 cp config/* $AIRFLOW_DIR/config
-cp templates/* $AIRFLOW_DIR/templates
+cp -r templates/* $AIRFLOW_DIR/templates
 # Setup environment variables and install requirements
 echo -e "AIRFLOW_UID=$(id -u)" > $GIT_REPO/dockers/.env
 export AIRFLOW_UID=$(id -u)
