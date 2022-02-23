@@ -114,8 +114,8 @@ def upload_example():
         cid, required = community
         missing = [r for r in required if r not in template]
         if any(missing):
-            print(f"Community {cid} required field {missing} are missing")
-            return
+            print(f"Community {cid} required field {missing} are missing. This could pose some problems")
+            
 
         
         r = create_draft_record(server=server, token=token, record=template)
