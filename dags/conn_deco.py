@@ -97,9 +97,10 @@ def conn_decorator():
     
     
     @task()
-    def doing_nothing(**kwargs):
+    def doing_nothing(a_id, **kwargs):
         conn_id = get_conn_id(**kwargs)
         print(f"Just doing nothing with {conn_id}")
+        print(f"I also got ", a_id)
         
         ssh_hook = get_connection(conn_id=conn_id)
         with ssh_hook.get_conn() as ssh_client:
@@ -112,7 +113,9 @@ def conn_decorator():
         return conn_id
 
     conn_id = PythonOperator(python_callable=setup, task_id='setup_connection')
-    dno = doing_nothing()
+    # another way of mixing taskflow and classical api:
+    a_id = conn_id.output['return_value']
+    dno = doing_nothing(a_id=a_id)
     en = PythonOperator(python_callable=remove, op_kwargs={'conn_id': dno}, task_id='cleanup')
 
     conn_id >> dno >> en
