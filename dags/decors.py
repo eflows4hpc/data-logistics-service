@@ -33,7 +33,7 @@ def get_connection(conn_id):
     if conn_id.startswith('vault'):
         vault_hook = VaultHook(vault_conn_id='my_vault')
         con = vault_hook.get_secret(
-            secret_path=f"ssh-credentials/{conn_id[6:]}")
+            secret_path=f"/data/ssh-credentials/{conn_id[6:]}")
         print(f"Got some values from vault {list(con.keys())}")
 
         # for now SSH is hardcoded
