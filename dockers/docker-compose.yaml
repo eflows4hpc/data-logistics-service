@@ -75,6 +75,37 @@ x-airflow-common:
       condition: service_healthy
 
 services:
+
+  reverse-proxy:
+    image: "jwilder/nginx-proxy:alpine"
+    container_name: "reverse-proxy"
+    volumes:
+      - "html:/usr/share/nginx/html"
+      - "dhparam:/etc/nginx/dhparam"
+      - "vhost:/etc/nginx/vhost.d"
+      - "certs:/etc/nginx/certs"
+      - "/run/docker.sock:/tmp/docker.sock:ro"
+    restart: "always"
+    ports:
+      - "80:80"
+      - "443:443"
+
+  letsencrypt:
+    image: "jrcs/letsencrypt-nginx-proxy-companion:latest"
+    container_name: "letsencrypt-helper"
+    volumes:
+      - "html:/usr/share/nginx/html"
+      - "dhparam:/etc/nginx/dhparam"
+      - "vhost:/etc/nginx/vhost.d"
+      - "certs:/etc/nginx/certs"
+      - "/run/docker.sock:/var/run/docker.sock:ro"
+    environment:
+      NGINX_PROXY_CONTAINER: "reverse-proxy"
+      DEFAULT_EMAIL: "m.petrova@fz-juelich.de"
+    restart: "always"
+    depends_on:
+      - "reverse-proxy"
+
   postgres:
     image: postgres:13
     environment:
@@ -105,6 +136,13 @@ services:
     command: webserver
     ports:
       - 7001:8080
+    
+    environment:
+      <<: *airflow-common-env
+      VIRTUAL_HOST: datalogistics.eflows4hpc.eu
+      LETSENCRYPT_HOST: datalogistics.eflows4hpc.eu
+      VIRTUAL_PORT: 8080
+
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 60s
@@ -285,3 +323,8 @@ services:
 
 volumes:
   postgres-db-volume:
+  certs:
+  html:
+  vhost:
+  dhparam:
+
