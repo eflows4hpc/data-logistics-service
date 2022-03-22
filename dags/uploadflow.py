@@ -11,7 +11,7 @@ from airflow.utils.dates import days_ago
 
 from b2shareoperator import (add_file, create_draft_record, get_community,
                              submit_draft)
-from decors import remove, setup
+from decors import remove, setup, get_connection
 
 default_args = {
     'owner': 'airflow',
@@ -45,7 +45,7 @@ def upload_example():
         target = params.get('target', '/tmp/')
         source = params.get('source', '/tmp/')
 
-        ssh_hook = SSHHook(ssh_conn_id=connection_id)
+        ssh_hook = get_connection(conn_id=connection_id, default_host='amdlogin.bsc.es')
         with ssh_hook.get_conn() as ssh_client:
             sftp_client = ssh_client.open_sftp()
             lst = sftp_client.listdir(path=source)

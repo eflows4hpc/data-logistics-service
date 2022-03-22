@@ -58,7 +58,7 @@ def taskflow_example():
         target = params.get('target', '/tmp/')
 
         print(f"Using {connection_id} connection")
-        ssh_hook = get_connection(conn_id=connection_id)
+        ssh_hook = get_connection(conn_id=connection_id, default_host='amdlogin.bsc.es')
 
         with ssh_hook.get_conn() as ssh_client:
             sftp_client = ssh_client.open_sftp()

@@ -23,7 +23,7 @@ def conn_decorator():
     def doing_nothing(conn_id):
         print(f"Using connection {conn_id}")
 
-        ssh_hook = get_connection(conn_id=conn_id)
+        ssh_hook = get_connection(conn_id=conn_id, default_host='amdlogin.bsc.es')
         with ssh_hook.get_conn() as ssh_client:
             sftp_client = ssh_client.open_sftp()
             print("Connected")
