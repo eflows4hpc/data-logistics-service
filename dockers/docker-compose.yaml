@@ -62,7 +62,7 @@ x-airflow-common:
   volumes:
     - ./dags:/opt/airflow/dags
     - ./config/airflow.cfg:/opt/airflow/airflow.cfg
-    - ./logs:/opt/airflow/logs
+    - logs:/opt/airflow/logs
     - ./plugins:/opt/airflow/plugins
     - ./templates/main.html:/home/airflow/.local/lib/python3.7/site-packages/airflow/www/templates/airflow/main.html
     - ./templates/img/BMBF_gefoerdert_2017_en.jpg:/home/airflow/.local/lib/python3.7/site-packages/airflow/www/static/BMBF_gefoerdert_2017_en.jpg
@@ -75,6 +75,37 @@ x-airflow-common:
       condition: service_healthy
 
 services:
+
+  reverse-proxy:
+    image: "jwilder/nginx-proxy:alpine"
+    container_name: "reverse-proxy"
+    volumes:
+      - "html:/usr/share/nginx/html"
+      - "dhparam:/etc/nginx/dhparam"
+      - "vhost:/etc/nginx/vhost.d"
+      - "certs:/etc/nginx/certs"
+      - "/run/docker.sock:/tmp/docker.sock:ro"
+    restart: "always"
+    ports:
+      - "80:80"
+      - "443:443"
+
+  letsencrypt:
+    image: "jrcs/letsencrypt-nginx-proxy-companion:latest"
+    container_name: "letsencrypt-helper"
+    volumes:
+      - "html:/usr/share/nginx/html"
+      - "dhparam:/etc/nginx/dhparam"
+      - "vhost:/etc/nginx/vhost.d"
+      - "certs:/etc/nginx/certs"
+      - "/run/docker.sock:/var/run/docker.sock:ro"
+    environment:
+      NGINX_PROXY_CONTAINER: "reverse-proxy"
+      DEFAULT_EMAIL: "m.petrova@fz-juelich.de"
+    restart: "always"
+    depends_on:
+      - "reverse-proxy"
+
   postgres:
     image: postgres:13
     environment:
@@ -105,6 +136,13 @@ services:
     command: webserver
     ports:
       - 7001:8080
+    
+    environment:
+      <<: *airflow-common-env
+      VIRTUAL_HOST: datalogistics.eflows4hpc.eu
+      LETSENCRYPT_HOST: datalogistics.eflows4hpc.eu
+      VIRTUAL_PORT: 8080
+
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 60s
@@ -149,7 +187,7 @@ services:
     volumes:
       - ./dags:/opt/airflow/dags
       - ./config/airflow.cfg:/opt/airflow/airflow.cfg
-      - ./logs:/opt/airflow/logs
+      - logs:/opt/airflow/logs
       - ./tmp/:/work/
     depends_on:
       <<: *airflow-common-depends-on
@@ -284,4 +322,10 @@ services:
         condition: service_completed_successfully
 
 volumes:
+  logs:
   postgres-db-volume:
+  certs:
+  html:
+  vhost:
+  dhparam:
+

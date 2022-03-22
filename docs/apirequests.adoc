@@ -36,7 +36,7 @@ Following parameters are expected:
 Those will be used to create a temporary connection (with randomized name). The connection will be deleted after the pipline run. 
 
 ==== Passing vault connection id ====
-(not implemented yet)
+Credentials from vault can be used to access resources. This is achieved by passing a id of the creentials in vault to the respecitve pipeline. The parameter is ```vault_id``` and crednetials are located in the vault defined in admin/connections/my_vault. The location of the credentials in vault is defined as follows: ```/secret/data/ssh-credentials/<vault-id-value>```
 
 
 === Starting data transfer ===

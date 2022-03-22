@@ -41,21 +41,18 @@ export AIRFLOW_UID=$(id -u)
 echo "Collecting requirements"
 reqs=`cat $GIT_REPO/requirements.txt | tr '\n' ' '`
 echo "Collected requirements: $reqs"
-# sudo sh -c "echo \"_PIP_ADDITIONAL_REQUIREMENTS=\"$reqs\"\" >> $GIT_REPO/dockers/.env"
+
 echo "_PIP_ADDITIONAL_REQUIREMENTS=\"$reqs\"" >> $GIT_REPO/dockers/.env
 pip install -r $GIT_REPO/requirements.txt
 
-# sed -i "s_datacatalog.fz-juelich.de_${SERVER_DOMAIN}_g" docker-compose.yml
+sed -i "s_datalogistics.eflows4hpc.eu/_${SERVER_DOMAIN}_g" docker-compose.yml
 
 # it is at this point assumed that ip and volume are correctly assigned, and that dns is working properly
 echo "-----------Bringing up the docker containers-----------"
 docker-compose -f $GIT_REPO/dockers/docker-compose.yaml pull #  pull changed images (e.g. new latest, or specific tag)
 
-docker-compose -f $GIT_REPO/dockers/docker-compose.yaml --project-directory $AIRFLOW_DIR --verbose up airflow-init
+# no init for persistent database & dirs
+#docker-compose -f $GIT_REPO/dockers/docker-compose.yaml --project-directory $AIRFLOW_DIR --verbose up airflow-init
 docker-compose -f $GIT_REPO/dockers/docker-compose.yaml --project-directory $AIRFLOW_DIR up -d
-
-# docker-compose up -d # should only restart changed images, which will also update nginx and reverse-proxy image if needed
-
-# nohup docker-compose logs -f >/app/mnt/docker.log & # or similar to capture docker log TODO (seems to cause gitlab CI to hang)
 
 cd $OLD_DIR
