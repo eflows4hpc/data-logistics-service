@@ -7,14 +7,15 @@ variables:
   OS_IDENTITY_API_VERSION: 3
   OS_REGION_NAME: "HDFCloud"
   OS_INTERFACE: public
-  TESTING_IP: 134.94.199.220
-  OLD_TEST_NAME: old-airflow-test
-  TESTING_NAME: airflow-testing
-  TESTING_URL: http://134.94.199.220:7001/home
-  TESTING_DOMAIN: zam10220.zam.kfa-juelich.de
+  PRODUCTION_IP: 134.94.199.220
+  OLD_PROD_NAME: old-airflow-production
+  PRODUCTION_NAME: airflow-production
+  PRODUCTION_URL: https://datalogistics.eflows4hpc.eu
+  TESTING_DOMAIN: datalogistics.eflows4hpc.eu
   AIRFLOW_TESTUSER: "airflow"
   AIRFLOW__SECRETS__BACKEND_KWARGS: $TESTING_AIRFLOW__SECRETS__BACKEND_KWARGS
   AIRFLOW__SECRETS__BACKEND: datacat_integration.secrets.DatacatSecretsBackend
+  VOLUME_ID: 6b58c3a6-691b-496a-8afd-153637c2de48
   DOCKER_TLS_CERTDIR: ""
 
 
@@ -77,30 +78,34 @@ build-custom-image:
     - docker push $IMAGE_LATEST_TAG
 
 
-full-deploy-testing:
+full-deploy-production:
   stage: deploy
-  environment: Testing
+  environment: Production
   only: 
     - web
   <<: *ssh_setup
   script:
     - echo "Starting the full testing deployment of airflows example."
     - pip install python-openstackclient
-    - OLD_ID=`openstack server show $TESTING_NAME -f value -c id` && server_exists=true || echo "No testing server found. It might be a first time deployment"
+    - OLD_ID=`openstack server show $PRODUCTION_NAME -f value -c id` && server_exists=true || echo "No production server found. It might be a first time deployment"
     - if [ "$server_exists" = true ] ; then
-      openstack server set --name $OLD_TEST_NAME $OLD_ID;
+      openstack server set --name $OLD_PROD_NAME $OLD_ID;
       fi
-    - INSTANCE_ID=`openstack server create -f value -c id --prefix IMAGE_ --flavor m4 --image 149a65b5-aeb8-499f-aaa6-ec966bd28dd6 --user-data scripts/cloudinit.yml --security-group ssh --security-group airflows --security-group www --security-group https $TESTING_NAME`
+    - INSTANCE_ID=`openstack server create -f value -c id --prefix IMAGE_ --flavor m4 --image 149a65b5-aeb8-499f-aaa6-ec966bd28dd6 --user-data scripts/cloudinit.yml --security-group ssh --security-group www --security-group https $PRODUCTION_NAME`
     - while [ "`openstack server show $INSTANCE_ID -c addresses -f value`" = "{}" ]; do sleep 5; done # wait until an address is available to attach the floating ip
-    - openstack server add floating ip $INSTANCE_ID $TESTING_IP
+    - openstack server add floating ip $INSTANCE_ID $PRODUCTION_IP
     - sleep 10 # ensure that next command reaches the new server, prevents host key problems
-    - until ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP ls /finished_cloudinit >/dev/null 2>&1; do sleep 30; done # wait until cloudinit script is complete
-    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $TESTING_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS"
+    # do the mount /dev/vdb1 stuff
+    - openstack server add volume $INSTANCE_ID $VOLUME_ID
+    - sleep 20 # apparently it may take some time until the volume is available to the OS
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "sudo mkdir -p /persistent_data && sudo mount /dev/vdb1 /persistent_data"
+    - until ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP ls /finished_cloudinit >/dev/null 2>&1; do sleep 30; done # wait until cloudinit script is complete
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $PRODUCTION_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS"
     - echo "Done"
 
 # NOTE Light deployment did not perform well when the template/main.html file was changed (in case of the official airflow image being updated)
 # TODO Add proper tests
-light-deploy-testing:
+light-deploy-production:
   stage: deploy
   # only run when master is updated, unless the pipeline was triggered via the web UI
   only:
@@ -109,12 +114,12 @@ light-deploy-testing:
     - tags
     - web
   <<: *ssh_setup
-  environment: Testing
+  environment: Production
   script:
-    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "cd /home/airflow/data-logistics-service && sudo git stash && sudo git stash clear && sudo git checkout main && sudo git checkout -f $CI_COMMIT_TAG && sudo git pull --all"
-    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $TESTING_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS"
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "cd /home/airflow/data-logistics-service && sudo git stash && sudo git stash clear && sudo git checkout main && sudo git checkout -f $CI_COMMIT_TAG && sudo git pull --all"
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $PRODUCTION_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS"
 
-test-testingdeployment_webserver:
+test-production-webserver:
   cache: {}
   stage: test-deployment 
   only:
@@ -126,11 +131,11 @@ test-testingdeployment_webserver:
     - echo "This is a simple check if the deployment was successful and dags get executed"
     # ensure that the docker containers are up and running before testing the airflow deployment; timeout in 16 to 17 minutes
     - SECONDS=0
-    - 'while [ $SECONDS -le 1000 ] ; do if output=$(curl --insecure --max-time 10 -I -H "Accept: application/json" $TESTING_URL) ; then break; else sleep 30; fi ; done'
-    - 'curl --insecure -I -H "Accept: application/json" $TESTING_URL'
-    - 'curl -X GET -u $AIRFLOW_TESTUSER:$AIRFLOW_TESTUSER_PASS -H "Content-Type: application/json" $TESTING_IP:7001/api/v1/dags'
-    - 'curl -X GET -u $AIRFLOW_TESTUSER:$AIRFLOW_TESTUSER_PASS -H "Content-Type: application/json" $TESTING_IP:7001/api/v1/connections'
-    - 'curl -X POST -u $AIRFLOW_TESTUSER:$AIRFLOW_TESTUSER_PASS -H "Content-Type: application/json" --data {} $TESTING_IP:7001/api/v1/dags/testdag/dagRuns'
+    - 'while [ $SECONDS -le 1000 ] ; do if output=$(curl --insecure --max-time 10 -I -H "Accept: application/json" $PRODUCTION_URL/home) ; then break; else sleep 30; fi ; done'
+    - 'curl --insecure -I -H "Accept: application/json" $PRODUCTION_URL/home'
+    - 'curl -X GET -u $AIRFLOW_TESTUSER:$AIRFLOW_TESTUSER_PASS -H "Content-Type: application/json" $PRODUCTION_URL/api/v1/dags'
+    - 'curl -X GET -u $AIRFLOW_TESTUSER:$AIRFLOW_TESTUSER_PASS -H "Content-Type: application/json" $PRODUCTION_URL/api/v1/connections'
+    - 'curl -X POST -u $AIRFLOW_TESTUSER:$AIRFLOW_TESTUSER_PASS -H "Content-Type: application/json" --data {} $PRODUCTION_URL/api/v1/dags/testdag/dagRuns'
 
 cleanup-successful-full-deployment:
   # check if there is an old prod or test instance, and delete it if present

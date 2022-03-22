@@ -46,6 +46,15 @@ users:
     ssh_authorized_keys:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCeJcmX8ogs4/KDQwsQHdCwk5iZz7bYJdthvX0y0YIrslhkW1KfDbOJMdRRLBcKmSCIdPofRkWkgj1hFEW4MqDCNSftLfUDTsymxNdF0dZxaX0jM2K1K7sFr1JG2Lkuxao2g9AoRKqyydlVhApoY8UhwpDaNOAFx5q0Pa7FchWvFX37r0AU5JZTsDFSDM9NaSZll78vwK1wjhhHi4EEFAs2IkrySOGzJTkaHwZrqYMJgEIvtfHN14UJR9WDmnPvSIRe/GzRg1xz3Op4E+S0/jK2bR5jJTMJJka19FjShxlqMr0UbhwBgiKYRhpfqhy+MWGz9H5GvWNdiUbBV8jdlZQHjFujAlzErJ/Twmnn0YVNUX+9ZoyEa/NKMS2quKAUhhQaD04TbAIKNt0iFbOFcbrfpbBXw7PiruIeHGFgmcxug3FcOX6xmHVuPVi1Zm1CxMxaydS7QStUchZdHN0Rc9AF2MOB/ZuKQCUbJZ2pKpP5i90eLbwhZAYvH5DAn9g6w+/6CjuFj1fB4Ywgmv+TvZ0NwtrJRhARN/1nY9uxVSoFAvxrlx3FU0bw0c/3YojY9j+LBJYf+e3Y1R2ZBSVUYGn2eACF86fnGs6Bz/WmrZW6WWrSiEwxtElkQRnuAb35L/V5VFrZv+x0qtoMNl0EK0Rz6CKMD5HHrI6Z2FNqOO6bEQ== service@gitlab
 
+write_files:
+  - path: /etc/docker/daemon.json
+    permission: 0744
+    owner: root
+    content: |
+      {
+        "data-root": "/persistent_data/docker_volumes"
+      }
+
 runcmd:
   - echo "Downloading latest version of docker-compose"
   - sudo pip3 install docker-compose
@@ -53,8 +62,6 @@ runcmd:
   - echo "Current user is $(whoami)"
   - sudo -u airflow git clone https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service.git ./data-logistics-service
   - cd ./data-logistics-service
-  - docker network create net
-  - docker network create airflow
   - touch /finished_cloudinit
 
 final_message: "The system is finally up, after $UPTIME seconds"
