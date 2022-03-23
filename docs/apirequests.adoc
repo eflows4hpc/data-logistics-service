@@ -24,7 +24,7 @@ There should be an object created in B2SHARE, each object in B2SHARE is identifi
 === Credentials handling [[credentials]]
 Credentials needed to access SSH-based storages should be passed over to the pipelines (both for up- and download) as pipelines parameters. Basically each DLS pipelines can be extended by tasks to handle those parameters and convert them into connections that can be used in the remainings of the pipeline. The code for that can be found in <a href='dags/conn_deco.py'>+dags/conn_deco.py+</a>. 
 
-==== Passing credentials directly ==== 
+==== Passing credentials directly [[direct]]==== 
 Following parameters are expected:
 
 ----
@@ -36,14 +36,21 @@ Following parameters are expected:
 Those will be used to create a temporary connection (with randomized name). The connection will be deleted after the pipline run. 
 
 ==== Passing vault connection id ====
-Credentials from vault can be used to access resources. This is achieved by passing a id of the creentials in vault to the respecitve pipeline. The parameter is ```vault_id``` and crednetials are located in the vault defined in admin/connections/my_vault. The location of the credentials in vault is defined as follows: ```/secret/data/ssh-credentials/<vault-id-value>```
+Credentials from vault can be used to access resources. This is achieved by passing a id of the creentials in vault to the respecitve pipeline. The parameter is ```vault_id``` and crednetials are located in the vault defined in admin/connections/my_vault. The location of the credentials in vault is defined as follows: ```/secret/data/ssh-credentials/<vault-id-value>```. Only ssh (private) key will be retrieved, other parameters needs to be provided explicitly to the pipeline like in <<direct>>, i.e., 
+
+----
+   host = params.get('host')
+   port = params.get('port', 2222)
+   user = params.get('login')
+   vault_id = params.get('vault_id')
+----
 
 
 === Starting data transfer ===
 To start a transfer following request needs to be sent it includes B2SHARE object id as a parameter. For testing purposes one can use +b38609df2b334ea296ea1857e568dbea+ which
 includes one 100MB file. The target parameter is optional with default value +/tmp/+ and determines location to which the files from B2SHARE object will be uploaded.
 
-The parameters should be passed along the credentials as described in <<credentials>>.
+The parameters should be passed along the credentials as described in <<credentials>>. The target directory will be created with ``mkdir -p`` on the target machine. 
 
 ----
 curl -X POST -u USER:PASS -H "Content-Type: application/json" \
