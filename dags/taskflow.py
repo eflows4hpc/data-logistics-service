@@ -62,6 +62,8 @@ def taskflow_example():
 
         with ssh_hook.get_conn() as ssh_client:
             sftp_client = ssh_client.open_sftp()
+            # check dir?
+            sftp_client.mkdir(target, ignore_existing=True)
             for [truename, local] in files.items():
                 print(
                     f"Copying {local} --> {connection_id}:{os.path.join(target, truename)}")

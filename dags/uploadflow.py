@@ -7,6 +7,7 @@ from airflow.models.connection import Connection
 from airflow.operators.python import PythonOperator
 from airflow.providers.http.hooks.http import HttpHook
 from airflow.utils.dates import days_ago
+from airflow.models import Variable
 
 from b2shareoperator import (add_file, create_draft_record, get_community,
                              submit_draft)
@@ -41,7 +42,7 @@ def upload_example():
     @task()
     def load(connection_id, **kwargs):
         params = kwargs['params']
-        target = params.get('target', '/tmp/')
+        target = Variable.get("working_dir", default_var='/tmp/')
         source = params.get('source', '/tmp/')
 
         ssh_hook = get_connection(conn_id=connection_id, **kwargs)
@@ -93,10 +94,13 @@ def upload_example():
         for [local, true_name] in files.items():
             print(f"Uploading {local} --> {true_name}")
             _ = add_file(record=r, fname=local, token=token, remote=true_name)
+            # delete local
+            os.unlink(local)
 
         print("Submitting record for pubication")
         submitted = submit_draft(record=r, token=token)
         print(f"Record created {submitted['id']}")
+
         return submitted['id']
 
 
