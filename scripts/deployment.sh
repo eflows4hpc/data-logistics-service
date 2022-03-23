@@ -16,7 +16,7 @@ if [ -z ${3+x} ]; then unset AIRFLOW__SECRETS__BACKEND; else export AIRFLOW__SEC
 if [ -z ${3+x} ]; then unset AIRFLOW__SECRETS__BACKEND_KWARGS; else export AIRFLOW__SECRETS__BACKEND_KWARGS=$5; fi
 
 echo "DEBUG values: OLD_DIR=$OLD_DIR, ENTRYPOINT_DIR=$ENTRYPOINT and GIT_REPO=$GIT_REPO"
-echo "DEBUG using secrets backend: $4"
+echo "DEBUG using secrets backend: $AIRFLOW__SECRETS__BACKEND"
 echo "DEBUG backend args length: ${#AIRFLOW__SECRETS__BACKEND_KWARGS}"
 
 cd $ENTRYPOINT

@@ -11,7 +11,7 @@ variables:
   OLD_PROD_NAME: old-airflow-production
   PRODUCTION_NAME: airflow-production
   PRODUCTION_URL: https://datalogistics.eflows4hpc.eu
-  TESTING_DOMAIN: datalogistics.eflows4hpc.eu
+  PRODUCTION_DOMAIN: datalogistics.eflows4hpc.eu
   AIRFLOW_TESTUSER: "airflow"
   AIRFLOW__SECRETS__BACKEND_KWARGS: $TESTING_AIRFLOW__SECRETS__BACKEND_KWARGS
   AIRFLOW__SECRETS__BACKEND: datacat_integration.secrets.DatacatSecretsBackend
@@ -49,13 +49,13 @@ test:
     - pip install nose==1.3.7
     - airflow connections add --conn-uri https://b2share-testing.fz-juelich.de/ default_b2share
   script: 
-   - ls 
-   - pwd
-   - cp dags/* /opt/airflow/dags/
-   - airflow dags list 
-   - airflow connections list
-   - airflow dags test testdag 2021-08-18
-   - nosetests
+    - ls
+    - pwd
+    - cp dags/* /opt/airflow/dags/
+    - airflow dags list
+    - airflow connections list
+    - airflow dags test testdag 2021-08-18
+    - nosetests
 
 
 build-custom-image:
