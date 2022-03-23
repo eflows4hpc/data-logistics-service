@@ -20,10 +20,10 @@ def_args = {
 def conn_decorator():
 
     @task()
-    def doing_nothing(conn_id):
+    def doing_nothing(conn_id, **kwargs):
         print(f"Using connection {conn_id}")
 
-        ssh_hook = get_connection(conn_id=conn_id, default_host='amdlogin.bsc.es')
+        ssh_hook = get_connection(conn_id=conn_id, **kwargs)
         with ssh_hook.get_conn() as ssh_client:
             sftp_client = ssh_client.open_sftp()
             print("Connected")

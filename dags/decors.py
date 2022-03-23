@@ -29,7 +29,7 @@ def create_temp_connection(rrid, params):
     return conn_id
 
 
-def get_connection(conn_id, default_host='amdlogin.bsc.es'):
+def get_connection(conn_id, **kwargs):
     if conn_id.startswith('vault'):
         vault_hook = VaultHook(vault_conn_id='my_vault')
         con = vault_hook.get_secret(
@@ -37,9 +37,11 @@ def get_connection(conn_id, default_host='amdlogin.bsc.es'):
         print(f"Got some values from vault {list(con.keys())}")
 
         # for now SSH is hardcoded
-        host = con.get('host', default_host)
-        port = int(con.get('port', 22))
-        hook = SSHHook(remote_host=host, port=port, username=con['userName'])
+        params = kwargs['params']
+        host = params.get('host')
+        port = int(params.get('port', 2222))
+        user = params.get('login', 'eflows')
+        hook = SSHHook(remote_host=host, port=port, username=user)
         # key in vault should be in form of formated string:
         # -----BEGIN OPENSSH PRIVATE KEY-----
         # b3BlbnNzaC1rZXktdjEAAAAA

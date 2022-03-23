@@ -58,10 +58,12 @@ def taskflow_example():
         target = params.get('target', '/tmp/')
 
         print(f"Using {connection_id} connection")
-        ssh_hook = get_connection(conn_id=connection_id, default_host='amdlogin.bsc.es')
+        ssh_hook = get_connection(conn_id=connection_id, **kwargs)
 
         with ssh_hook.get_conn() as ssh_client:
             sftp_client = ssh_client.open_sftp()
+            # check dir?
+            ssh_client.exec_command(command=f"mkdir -p {target}")
             for [truename, local] in files.items():
                 print(
                     f"Copying {local} --> {connection_id}:{os.path.join(target, truename)}")
