@@ -7,7 +7,6 @@
 OLD_DIR=`pwd`
 GIT_REPO=$HOME/data-logistics-service
 
-echo "DEBUG_1 $0 $1 $2 $3 $4 $5"
 
 #if null (var + trim empty strings)
 if [ -z ${1+x} ]; then ENTRYPOINT=`pwd`; else ENTRYPOINT=$1; fi
@@ -16,9 +15,9 @@ if [ -z ${3+x} ]; then export SERVER_DOMAIN=dls.fz-juelich.de; else export SERVE
 if [ -z ${3+x} ]; then unset AIRFLOW__SECRETS__BACKEND; else export AIRFLOW__SECRETS__BACKEND=$4; fi
 if [ -z ${3+x} ]; then unset AIRFLOW__SECRETS__BACKEND_KWARGS; else export AIRFLOW__SECRETS__BACKEND_KWARGS=$5; fi
 
-echo "DEBUG_2 $0 $1 $2 $3 $4 $5"
 echo "DEBUG values: OLD_DIR=$OLD_DIR, ENTRYPOINT_DIR=$ENTRYPOINT and GIT_REPO=$GIT_REPO"
 echo "DEBUG using secrets backend: $4"
+echo "DEBUG backend args length: ${#AIRFLOW__SECRETS__BACKEND_KWARGS}"
 
 cd $ENTRYPOINT
 mkdir -p eflows-airflow
