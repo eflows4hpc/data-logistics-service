@@ -6,7 +6,6 @@ from airflow.decorators import dag, task
 from airflow.models.connection import Connection
 from airflow.operators.python import PythonOperator
 from airflow.providers.http.hooks.http import HttpHook
-from airflow.providers.ssh.hooks.ssh import SSHHook
 from airflow.utils.dates import days_ago
 
 from b2shareoperator import (add_file, create_draft_record, get_community,
@@ -45,7 +44,7 @@ def upload_example():
         target = params.get('target', '/tmp/')
         source = params.get('source', '/tmp/')
 
-        ssh_hook = get_connection(conn_id=connection_id, default_host='amdlogin.bsc.es')
+        ssh_hook = get_connection(conn_id=connection_id, **kwargs)
         with ssh_hook.get_conn() as ssh_client:
             sftp_client = ssh_client.open_sftp()
             lst = sftp_client.listdir(path=source)
@@ -82,7 +81,7 @@ def upload_example():
             server=server, community_id=template['community'])
         if not community:
             print("Not existing community")
-            return
+            return -1
         cid, required = community
         missing = [r for r in required if r not in template]
         if any(missing):
