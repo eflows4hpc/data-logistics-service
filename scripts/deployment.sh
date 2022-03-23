@@ -33,7 +33,7 @@ mkdir -p ./dags ./logs ./plugins ./config ./templates
 cd $GIT_REPO
 cp -r dags/* $AIRFLOW_DIR/dags
 cp -r plugins/* $AIRFLOW_DIR/plugins
-cp config/* $AIRFLOW_DIR/config
+cp config/* $AIRFLOW_DIR/config/
 cp -r templates/* $AIRFLOW_DIR/templates
 # Setup environment variables and install requirements
 echo -e "AIRFLOW_UID=$(id -u)" > $GIT_REPO/dockers/.env
@@ -45,7 +45,7 @@ echo "Collected requirements: $reqs"
 echo "_PIP_ADDITIONAL_REQUIREMENTS=\"$reqs\"" >> $GIT_REPO/dockers/.env
 pip install -r $GIT_REPO/requirements.txt
 
-sed -i "s_datalogistics.eflows4hpc.eu/_${SERVER_DOMAIN}_g" docker-compose.yml
+sed -i "s_datalogistics.eflows4hpc.eu/_${SERVER_DOMAIN}_g" $GIT_REPO/dockers/docker-compose.yaml
 
 # it is at this point assumed that ip and volume are correctly assigned, and that dns is working properly
 echo "-----------Bringing up the docker containers-----------"
