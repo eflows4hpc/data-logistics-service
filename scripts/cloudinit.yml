@@ -62,6 +62,7 @@ runcmd:
   - echo "Current user is $(whoami)"
   - sudo -u airflow git clone https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service.git ./data-logistics-service
   - cd ./data-logistics-service
+  - crontab -l | { cat ; echo '@daily root find /persistent_data/logs -mtime +13 -type f -delete'; } | crontab - # setup log clearing crontab
   - touch /finished_cloudinit
 
 final_message: "The system is finally up, after $UPTIME seconds"
