@@ -39,7 +39,7 @@ def get_connection(conn_id, **kwargs):
         # for now SSH is hardcoded
         params = kwargs['params']
         host = params.get('host')
-        port = int(params.get('port', 2222))
+        port = int(params.get('port', 22))
         user = params.get('login', 'eflows')
         hook = SSHHook(remote_host=host, port=port, username=user)
         # key in vault should be in form of formated string:

@@ -105,8 +105,7 @@ def upload_example():
 
 
 
-    setup_task = PythonOperator(
-        python_callable=setup, task_id='setup_connection')
+    setup_task = PythonOperator(python_callable=setup, task_id='setup_connection')
     a_id = setup_task.output['return_value']
 
     files = load(connection_id=a_id)
