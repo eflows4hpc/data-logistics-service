@@ -111,6 +111,8 @@ curl -X POST -u USER:PASS -H "Content-Type: application/json" \
    $DLS/dags/upload_example/dagRuns
 ----
 
+Optionally, the record created in b2share can be registered with data cat. This is achieved by providing 'register' parameter set to 'true'. This operation requires connection to data cat with credentials and named 'datacat'.
+
 
 === Image transfer example ===
 To transfer images from eFlows4HPC image build service use dag defined in +dags/image_transfer.py+ (transfer_image). It requires two parameters +image_id+ name of the image in the image
