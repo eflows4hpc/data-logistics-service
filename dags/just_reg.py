@@ -22,6 +22,23 @@ def get_record(name, url):
         }
     }
 
+def create_template(hrespo):
+    return {
+        "titles": [{"title": hrespo['title']}],
+        "creators": [{"creator_name": hrespo['creator_name']}],
+        "descriptions": [
+            {
+                "description": hrespo['description'],
+                "description_type": "Abstract"
+            }
+        ],
+        "community": "2d58eb08-af65-4cad-bd25-92f1a17d325b",
+        "community_specific": {
+            "90942261-4637-4ac0-97b8-12e1edb38739": {"helmholtz centre": ["Forschungszentrum Jülich"]}
+        },
+        "open_access": hrespo['open_access'] == "True"
+    }
+
 def get_parameter(parameter, default=False, **kwargs):
     params = kwargs['params']
     return params.get(parameter, default)
@@ -61,7 +78,9 @@ def datacat_registration_example():
         mid = '71e863ac-aee6-4680-a57c-de318530b71e'
         entry = hook.get_entry(datacat_type='storage_target', oid=mid)
         print(entry)
-        print(entry['metadata'])
+        print(entry.metadata)
+        print('---')
+        print(get_template(entry.metadata))
 
 
 
