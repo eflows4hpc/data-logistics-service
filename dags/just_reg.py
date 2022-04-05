@@ -1,3 +1,4 @@
+from urllib.parse import urljoin
 from airflow.decorators import dag, task
 from airflow.models.connection import Connection
 from airflow.operators.bash import BashOperator
@@ -46,21 +47,11 @@ def datacat_registration_example():
                                     )
         try:
             r = hook.create_entry(datacat_type='dataset', entry=entry)
-            print("Hook registration returned: ", r)
+            print("Hook registration returned: ", r, urljoin(hook.connection.url, r))
             return r 
-        except e:
+        except ConnectionError as e:
             print('Registration failed', e)
             return -1
-
-        #r = hook.run(endpoint='dataset', headers=auth_header,
-        #            json=get_record(name=f"DLS results {kwargs['run_id']}", url=object_url)
-        #            )
-        #if r.status_code==200:
-        #    d_id = r.json()[0]
-        #    print(f"Registered sucesfully: {hook.base_url}/dataset/{d_id}")
-        #    return d_id
-        #print(f"Registraton failed: {r.text}")
-        #return -1
 
 
 
