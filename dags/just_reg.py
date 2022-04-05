@@ -1,4 +1,4 @@
-from urllib.parse import urljoin
+
 from airflow.decorators import dag, task
 from airflow.models.connection import Connection
 from airflow.operators.bash import BashOperator
@@ -47,11 +47,22 @@ def datacat_registration_example():
                                     )
         try:
             r = hook.create_entry(datacat_type='dataset', entry=entry)
-            print("Hook registration returned: ", r, urljoin(hook.connection.url, r))
+            print("Hook registration returned: ", r)
             return r 
         except ConnectionError as e:
             print('Registration failed', e)
             return -1
+
+    @task
+    def get_template():
+        hook = DataCatalogHook()
+        print("Connected to datacat via hook", hook.list_type('dataset'))
+
+        mid = '71e863ac-aee6-4680-a57c-de318530b71e'
+        entry = hook.get_entry(datacat_type='storage_target', oid=mid)
+        print(entry)
+        print(entry['metadata'])
+
 
 
 
@@ -59,7 +70,8 @@ def datacat_registration_example():
     step2 = register(
         object_url='https://b2share-testing.fz-juelich.de/records/7a12fda26b2a4d248f96d012d54769b7')
 
-    step1 >> step2
+    step3 = get_template()
+    step1 >> step2 >> step3
 
 
 dag = datacat_registration_example()
