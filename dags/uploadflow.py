@@ -90,7 +90,10 @@ def upload_example():
             print(f"Community {cid} required field {missing} are missing. This could pose some problems")
 
         r = create_draft_record(server=server, token=token, record=template)
-        print(f"Draft record created {r['id']} --> {r['links']['self']}")
+        if 'id' in r:
+            print(f"Draft record created {r['id']} --> {r['links']['self']}")
+        else:
+            print('Something went wrong with registration', r, r.text)
 
         for [local, true_name] in files.items():
             print(f"Uploading {local} --> {true_name}")
