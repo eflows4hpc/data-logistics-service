@@ -6,7 +6,7 @@ from airflow.providers.http.hooks.http import HttpHook
 from airflow.utils.dates import days_ago
 from datacat_integration.hooks import DataCatalogHook
 from datacat_integration.connection import DataCatalogEntry
-
+import json
 
 default_args = {
     'owner': 'airflow',
@@ -76,11 +76,11 @@ def datacat_registration_example():
         print("Connected to datacat via hook", hook.list_type('dataset'))
 
         mid = '71e863ac-aee6-4680-a57c-de318530b71e'
-        entry = hook.get_entry(datacat_type='storage_target', oid=mid)
+        entry = json.loads(hook.get_entry(datacat_type='storage_target', oid=mid))
         print(entry)
-        print(entry.metadata)
+        print(entry['metadata'])
         print('---')
-        print(get_template(entry.metadata))
+        print(get_template(entry['metadata']))
 
 
 
