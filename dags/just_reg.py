@@ -80,7 +80,7 @@ def datacat_registration_example():
         print(entry)
         print(entry['metadata'])
         print('---')
-        print(get_template(entry['metadata']))
+        print(create_template(entry['metadata']))
 
 
 

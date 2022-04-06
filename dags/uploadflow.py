@@ -1,7 +1,7 @@
 
 import os
 import tempfile
-from urllib.parse import urljoin
+import json
 
 from airflow.decorators import dag, task
 from airflow.models import Variable
@@ -78,12 +78,18 @@ def upload_example():
         params = kwargs['params']
         mid = params['mid']
 
-        hook = HttpHook(http_conn_id='datacat', method='GET')
-        hrespo = hook.run(endpoint=f"storage_target/{mid}").json()['metadata']
-        print(hrespo)
-        template = create_template(hrespo=hrespo)
-        community = get_community(
-            server=server, community_id=template['community'])
+
+        hook = DataCatalogHook()
+        print("Connected to datacat via hook", hook.list_type('dataset'))
+        entry = json.loads(hook.get_entry(datacat_type='storage_target', oid=mid))
+
+        #hook = HttpHook(http_conn_id='datacat', method='GET')
+        #hrespo = hook.run(endpoint=f"storage_target/{mid}").json()['metadata']
+        print('Got following metadata', entry)
+
+        template = create_template(hrespo=entry['metadata'])
+        community = get_community(server=server, 
+                                  community_id=template['community'])
         if not community:
             print("Not existing community")
             return -1
@@ -129,7 +135,7 @@ def upload_example():
                                     )
         try:
             r = hook.create_entry(datacat_type='dataset', entry=entry)
-            print("Hook registration returned: ", r, urljoin(hook.connection.url, r))
+            print("Hook registration returned: ", r)
             return r 
         except ConnectionError as e:
             print('Registration failed', e)
