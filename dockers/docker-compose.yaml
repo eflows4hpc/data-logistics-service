@@ -323,7 +323,11 @@ services:
 
 volumes:
   postgres-db-volume:
+    external: true
+    name: persistent_postgres-db-volume
   certs:
+    external: true
+    name: persistent_certs
   html:
   vhost:
   dhparam:
