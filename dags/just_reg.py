@@ -90,7 +90,7 @@ def datacat_registration_example():
         object_url='https://b2share-testing.fz-juelich.de/records/7a12fda26b2a4d248f96d012d54769b7')
 
     step3 = get_template()
-    stepr = BashOperator(bash_command='rm /work/ww', task_id='nothing')
+    stepr = BashOperator(bash_command='rm /work/ww', task_id='remov')
     step1 >> step2 >> step3 >> stepr
 
 
