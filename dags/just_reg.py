@@ -85,12 +85,13 @@ def datacat_registration_example():
 
 
 
-    step1 = BashOperator(bash_command='ls', task_id='nothing')
+    step1 = BashOperator(bash_command='curl -X GET -k https://bscgrid20.bsc.es/image_creation/images/download/wordcount_skylake.sif -o /work/ww', task_id='nothing')
     step2 = register(
         object_url='https://b2share-testing.fz-juelich.de/records/7a12fda26b2a4d248f96d012d54769b7')
 
     step3 = get_template()
-    step1 >> step2 >> step3
+    stepr = BashOperator(bash_command='rm /work/ww', task_id='nothing')
+    step1 >> step2 >> step3 >> stepr
 
 
 dag = datacat_registration_example()

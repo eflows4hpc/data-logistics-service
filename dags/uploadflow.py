@@ -152,7 +152,7 @@ def upload_example():
 
     reg = register(object_url=uid)
 
-    setup_task >> files >> uid >> en
+    setup_task >> files >> uid >> reg >> en
 
 
 dag = upload_example()
