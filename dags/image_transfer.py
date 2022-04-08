@@ -1,11 +1,9 @@
 import os
-import shutil
 import requests
 
 from airflow.decorators import dag, task
 from airflow.utils.dates import days_ago
 from airflow.operators.python import PythonOperator
-import paramiko
 
 from decors import setup, get_connection, remove
 
@@ -13,13 +11,6 @@ default_args = {
     'owner': 'airflow',
 }
 
-class FastTransport(paramiko.Transport):
-
-    def __init__(self, sock):
-        super(FastTransport, self).__init__(sock)
-        self.window_size = 2147483647
-        self.packetizer.REKEY_BYTES = pow(2, 40)
-        self.packetizer.REKEY_PACKETS = pow(2, 40)
 
 
 @dag(default_args=default_args, schedule_interval=None, start_date=days_ago(2), tags=['example'])
@@ -36,7 +27,6 @@ def transfer_image():
         ssh_hook = get_connection(conn_id=connection_id, **kwargs)
 
         with ssh_hook.get_conn() as ssh_client:
-            ssh_client.s
             sftp_client = ssh_client.open_sftp()
             ssh_client.exec_command(command=f"mkdir -p {target}")
             
