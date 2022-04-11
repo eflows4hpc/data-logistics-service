@@ -11,7 +11,12 @@ default_args = {
     'owner': 'airflow',
 }
 
-
+def file_exist(sftp, name):
+    try:
+        r = sftp.stat(name)  
+        return r.st_size
+    except:
+        return -1
 
 @dag(default_args=default_args, schedule_interval=None, start_date=days_ago(2), tags=['example'])
 def transfer_image():
@@ -28,10 +33,19 @@ def transfer_image():
 
         with ssh_hook.get_conn() as ssh_client:
             sftp_client = ssh_client.open_sftp()
+            remote_name = os.path.join(target, image_id)
+            size = file_exist(sftp=sftp_client, name=remote_name)
+            if size>0:
+                print(f"File {remote_name} exists and has {size} bytes")
+                force = params.get('force', True)
+                if force!= True:
+                    return 0
+                print("Forcing overwrite")
+
             ssh_client.exec_command(command=f"mkdir -p {target}")
             
             with requests.get(url, stream=True, verify=False) as r:
-                with sftp_client.open(os.path.join(target, image_id), 'wb') as f:
+                with sftp_client.open(remote_name, 'wb') as f:
                     f.set_pipelined(pipelined=True)
                     while True:
                         chunk=r.raw.read(1024 * 1000)
