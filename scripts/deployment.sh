@@ -14,10 +14,15 @@ if [ -z ${2+x} ]; then echo "No user input for starting repository location. Def
 if [ -z ${3+x} ]; then export SERVER_DOMAIN=dls.fz-juelich.de; else export SERVER_DOMAIN=$3; fi
 if [ -z ${3+x} ]; then unset AIRFLOW__SECRETS__BACKEND; else export AIRFLOW__SECRETS__BACKEND=$4; fi
 if [ -z ${3+x} ]; then unset AIRFLOW__SECRETS__BACKEND_KWARGS; else export AIRFLOW__SECRETS__BACKEND_KWARGS=$5; fi
+if [ -z ${6+x} ]; then unset AIRFLOW__CORE__FERNET_KEY; else export AIRFLOW__CORE__FERNET_KEY=$6; fi
+
+
 
 echo "DEBUG values: OLD_DIR=$OLD_DIR, ENTRYPOINT_DIR=$ENTRYPOINT and GIT_REPO=$GIT_REPO"
 echo "DEBUG using secrets backend: $AIRFLOW__SECRETS__BACKEND"
 echo "DEBUG backend args length: ${#AIRFLOW__SECRETS__BACKEND_KWARGS}"
+echo "DEBUG fernet key: ${AIRFLOW__CORE__FERNET_KEY}"
+
 
 cd $ENTRYPOINT
 mkdir -p eflows-airflow
