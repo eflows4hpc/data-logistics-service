@@ -89,6 +89,7 @@ full-deploy-production:
     - pip install python-openstackclient
     - OLD_ID=`openstack server show $PRODUCTION_NAME -f value -c id` && server_exists=true || echo "No production server found. It might be a first time deployment"
     - if [ "$server_exists" = true ] ; then
+      ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "sudo docker-compose -f /home/airflow/data-logistics-service/dockers/docker-compose.yaml --project-directory /home/airflow/eflows-airflow down"
       openstack server set --name $OLD_PROD_NAME $OLD_ID;
       fi
     - openstack server remove volume $OLD_ID $VOLUME_ID
