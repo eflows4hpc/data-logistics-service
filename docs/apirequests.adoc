@@ -118,7 +118,7 @@ Optionally, the record created in b2share can be registered with data cat. This 
 To transfer images from eFlows4HPC image build service use dag defined in +dags/image_transfer.py+ (transfer_image). It requires two parameters +image_id+ name of the image in the image
 build service (e.g. "wordcount_skylake.sif") and +target+ which defines a path on the system where the image will be transfered to. 
 
-The parameters should be passed along the credentials as described in <<credentials>>. The target directory will be created with ``mkdir -p`` on the target machine. The image is streamed directly to the target location (no local copy on DLS worker).
+The parameters should be passed along the credentials as described in <<credentials>>. The target directory will be created with ``mkdir -p`` on the target machine. The image is streamed directly to the target location (no local copy on DLS worker). By default the file on the target location will be overwritten, this can be disabled by providing +force='false'+ as dag parameter.  
 
 ----
 curl -X POST -u USER:PASS -H "Content-Type: application/json" \
