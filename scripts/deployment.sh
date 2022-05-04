@@ -32,8 +32,8 @@ AIRFLOW_DIR=`pwd`
 echo "Project dir is set to: $AIRFLOW_DIR"
 echo "Proceeding as user $(whoami)"
 
-# clean out the target directory to ensure only new stuff is there
-rm -rf $AIRFLOW_DIR/*
+# clean out the target directory to ensure only new stuff is there | causes race conditions on light deployment, maybe add flag to script?
+# rm -rf $AIRFLOW_DIR/*
 
 # Make the necessary folders for the airflow artefacts and copy the corresponging content
 mkdir -p ./dags ./logs ./plugins ./config ./templates
