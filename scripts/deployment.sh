@@ -51,11 +51,7 @@ cp -r templates/* $AIRFLOW_DIR/templates
 # Setup environment variables and install requirements
 echo -e "AIRFLOW_UID=$(id -u)" > $GIT_REPO/dockers/.env
 export AIRFLOW_UID=$(id -u)
-echo "Collecting requirements"
-reqs=`cat $GIT_REPO/requirements.txt | tr '\n' ' '`
-echo "Collected requirements: $reqs"
 
-echo "_PIP_ADDITIONAL_REQUIREMENTS=\"$reqs\"" >> $GIT_REPO/dockers/.env
 pip install -r $GIT_REPO/requirements.txt
 
 sed -i "s_datalogistics.eflows4hpc.eu/_${SERVER_DOMAIN}_g" $GIT_REPO/dockers/docker-compose.yaml
