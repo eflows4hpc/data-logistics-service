@@ -1,9 +1,11 @@
-FROM apache/airflow:2.2.3
+FROM apache/airflow:2.2.5
 
 USER root
-RUN apt update && apt install git -y
+RUN apt update && apt install git -y && apt clean && rm -rf /var/lib/apt/lists/*
+COPY ./templates/main.html /home/airflow/.local/lib/python3.7/site-packages/airflow/www/templates/airflow/main.html
+COPY ./templates/img/BMBF_gefoerdert_2017_en.jpg /home/airflow/.local/lib/python3.7/site-packages/airflow/www/static/BMBF_gefoerdert_2017_en.jpg
 USER airflow
 
-RUN pip --version 
+RUN pip --version && python -m pip install --upgrade pip
 ADD requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
