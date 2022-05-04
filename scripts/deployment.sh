@@ -21,7 +21,7 @@ if [ -z ${6+x} ]; then unset AIRFLOW__CORE__FERNET_KEY; else export AIRFLOW__COR
 echo "DEBUG values: OLD_DIR=$OLD_DIR, ENTRYPOINT_DIR=$ENTRYPOINT and GIT_REPO=$GIT_REPO"
 echo "DEBUG using secrets backend: $AIRFLOW__SECRETS__BACKEND"
 echo "DEBUG backend args length: ${#AIRFLOW__SECRETS__BACKEND_KWARGS}"
-echo "DEBUG fernet key: ${AIRFLOW__CORE__FERNET_KEY}"
+#echo "DEBUG fernet key: ${AIRFLOW__CORE__FERNET_KEY}"
 
 
 cd $ENTRYPOINT
@@ -31,6 +31,9 @@ AIRFLOW_DIR=`pwd`
 #DEBUG prints
 echo "Project dir is set to: $AIRFLOW_DIR"
 echo "Proceeding as user $(whoami)"
+
+# clean out the target directory to ensure only new stuff is there
+rm -rf $AIRFLOW_DIR/*
 
 # Make the necessary folders for the airflow artefacts and copy the corresponging content
 mkdir -p ./dags ./logs ./plugins ./config ./templates
