@@ -32,8 +32,14 @@ AIRFLOW_DIR=`pwd`
 echo "Project dir is set to: $AIRFLOW_DIR"
 echo "Proceeding as user $(whoami)"
 
-# clean out the target directory to ensure only new stuff is there | causes race conditions on light deployment, maybe add flag to script?
-# rm -rf $AIRFLOW_DIR/*
+# stop all airflow containers while setting up the new ones
+docker-compose -f $GIT_REPO/dockers/docker-compose.yaml --project-directory $AIRFLOW_DIR down airflow-webserver
+docker-compose -f $GIT_REPO/dockers/docker-compose.yaml --project-directory $AIRFLOW_DIR down airflow-scheduler
+docker-compose -f $GIT_REPO/dockers/docker-compose.yaml --project-directory $AIRFLOW_DIR down airflow-triggerer
+docker-compose -f $GIT_REPO/dockers/docker-compose.yaml --project-directory $AIRFLOW_DIR down airflow-worker
+
+# clean out the target directory to ensure only new stuff is there
+rm -rf $AIRFLOW_DIR/*
 
 # Make the necessary folders for the airflow artefacts and copy the corresponging content
 mkdir -p ./dags ./logs ./plugins ./config ./templates
