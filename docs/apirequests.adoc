@@ -20,6 +20,11 @@ curl -X POST -u USER:PASS -H "Content-Type: application/json" \
 
 There should be an object created in B2SHARE, each object in B2SHARE is identified by a +id+, which needs to be passed to the DLS workflow as a parameter (see below).
 
+Vault Connection is a little bit specific to set up. It cannot be setup through the UI, the connection type needs to be vaults (with s for secure connection), it can be done through API:
+curl -X POST -u USER:PASS -H "Content-Type: application/json" \
+  --data '{"connection_id": "my_vault","conn_type":"vaults", "host": "zam10039.zam.kfa-juelich.de", "password": VAULTPASS}' \
+  $DLS/connections
+
 
 === Credentials handling [[credentials]]
 Credentials needed to access SSH-based storages should be passed over to the pipelines (both for up- and download) as pipelines parameters. Basically each DLS pipelines can be extended by tasks to handle those parameters and convert them into connections that can be used in the remainings of the pipeline. The code for that can be found in <a href='dags/conn_deco.py'>+dags/conn_deco.py+</a>. 
