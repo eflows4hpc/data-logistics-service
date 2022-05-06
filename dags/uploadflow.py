@@ -7,13 +7,12 @@ from airflow.decorators import dag, task
 from airflow.models import Variable
 from airflow.models.connection import Connection
 from airflow.operators.python import PythonOperator
-from airflow.providers.http.hooks.http import HttpHook
 from airflow.utils.dates import days_ago
 
 from b2shareoperator import (add_file, create_draft_record, get_community,
                              submit_draft)
 from decors import get_connection, remove, setup
-from just_reg import get_parameter, get_record
+from just_reg import get_parameter
 from datacat_integration.hooks import DataCatalogHook
 from datacat_integration.connection import DataCatalogEntry
 
@@ -80,16 +79,12 @@ def upload_example():
 
 
         hook = DataCatalogHook()
-        print("Connected to datacat via hook", hook.list_type('dataset'))
+        print("Connected to datacat via hook")
         entry = json.loads(hook.get_entry(datacat_type='storage_target', oid=mid))
-
-        #hook = HttpHook(http_conn_id='datacat', method='GET')
-        #hrespo = hook.run(endpoint=f"storage_target/{mid}").json()['metadata']
         print('Got following metadata', entry)
 
         template = create_template(hrespo=entry['metadata'])
-        community = get_community(server=server, 
-                                  community_id=template['community'])
+        community = get_community(server=server, community_id=template['community'])
         if not community:
             print("Not existing community")
             return -1
@@ -115,7 +110,7 @@ def upload_example():
         submitted = submit_draft(record=r, token=token)
         print(f"Record created {submitted}")
 
-        return submitted['links']['self']
+        return submitted['links']['publication']
 
     @task()
     def register(object_url, **kwargs):
@@ -128,11 +123,11 @@ def upload_example():
         print("Connected to datacat via hook", hook.list_type('dataset'))
     
         entry = DataCatalogEntry(name=f"DLS results {kwargs['run_id']}",
-                                 url=object_url, 
+                                 url=object_url,
                                  metadata= {
                                     "author": "DLS on behalf of eFlows",
                                     "access": "hook-based"}
-                                    )
+                                )
         try:
             r = hook.create_entry(datacat_type='dataset', entry=entry)
             print("Hook registration returned: ", r)
