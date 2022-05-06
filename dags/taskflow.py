@@ -1,16 +1,16 @@
 
-from airflow.operators.python import PythonOperator
-from airflow.decorators import dag, task
-from airflow.models.connection import Connection
-from airflow.models import Variable
-from airflow.utils.dates import days_ago
-import os
-from datacat_integration.hooks import DataCatalogHook
 import json
+import os
 
+from airflow.decorators import dag, task
+from airflow.models import Variable
+from airflow.models.connection import Connection
+from airflow.operators.python import PythonOperator
+from airflow.utils.dates import days_ago
+from datacat_integration.hooks import DataCatalogHook
 
+from b2shareoperator import download_file, get_file_list, get_object_md
 from decors import get_connection, remove, setup
-from b2shareoperator import (download_file, get_file_list, get_object_md)
 
 default_args = {
     'owner': 'airflow',
