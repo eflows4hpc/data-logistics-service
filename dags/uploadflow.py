@@ -12,7 +12,7 @@ from airflow.utils.dates import days_ago
 from b2shareoperator import (add_file, create_draft_record, get_community,
                              submit_draft)
 from decors import get_connection, remove, setup
-from just_reg import get_parameter
+from justreg import get_parameter
 from datacat_integration.hooks import DataCatalogHook
 from datacat_integration.connection import DataCatalogEntry
 
@@ -120,7 +120,7 @@ def upload_example():
             return 0
 
         hook = DataCatalogHook()
-        print("Connected to datacat via hook", hook.list_type('dataset'))
+        print("Connected to datacat via hook")
     
         entry = DataCatalogEntry(name=f"DLS results {kwargs['run_id']}",
                                  url=object_url,
@@ -131,7 +131,7 @@ def upload_example():
         try:
             r = hook.create_entry(datacat_type='dataset', entry=entry)
             print("Hook registration returned: ", r)
-            return r 
+            return f"{hook.base_url}/dataset/{r}" 
         except ConnectionError as e:
             print('Registration failed', e)
             return -1

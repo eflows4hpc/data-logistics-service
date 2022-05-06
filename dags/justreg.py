@@ -1,8 +1,6 @@
 
 from airflow.decorators import dag, task
-from airflow.models.connection import Connection
 from airflow.operators.bash import BashOperator
-from airflow.providers.http.hooks.http import HttpHook
 from airflow.utils.dates import days_ago
 from datacat_integration.hooks import DataCatalogHook
 from datacat_integration.connection import DataCatalogEntry
@@ -65,7 +63,7 @@ def datacat_registration_example():
         try:
             r = hook.create_entry(datacat_type='dataset', entry=entry)
             print("Hook registration returned: ", r)
-            return r 
+            return f"{hook.base_url}/dataset/{r}" 
         except ConnectionError as e:
             print('Registration failed', e)
             return -1
@@ -85,7 +83,7 @@ def datacat_registration_example():
 
 
 
-    step1 = BashOperator(bash_command='curl -X GET -k https://bscgrid20.bsc.es/image_creation/images/download/wordcount_skylake.sif -o /work/ww', task_id='nothing')
+    step1 = BashOperator(task_id='jj', bash_command='ls') #BashOperator(bash_command='curl -X GET -k https://bscgrid20.bsc.es/image_creation/images/download/wordcount_skylake.sif -o /work/ww', task_id='nothing')
     step2 = register(
         object_url='https://b2share-testing.fz-juelich.de/records/7a12fda26b2a4d248f96d012d54769b7')
 

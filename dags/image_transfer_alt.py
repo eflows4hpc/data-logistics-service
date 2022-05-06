@@ -6,7 +6,7 @@ from airflow.decorators import dag, task
 from airflow.utils.dates import days_ago
 from airflow.operators.python import PythonOperator
 from airflow.models import Variable
-from just_reg import get_parameter
+from justreg import get_parameter
 from decors import setup, get_connection, remove
 
 default_args = {
