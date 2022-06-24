@@ -13,7 +13,6 @@ variables:
   PRODUCTION_URL: https://datalogistics.eflows4hpc.eu
   PRODUCTION_DOMAIN: datalogistics.eflows4hpc.eu
   AIRFLOW_TESTUSER: "airflow"
-  AIRFLOW__SECRETS__BACKEND_KWARGS: $TESTING_AIRFLOW__SECRETS__BACKEND_KWARGS
   AIRFLOW__SECRETS__BACKEND: datacat_integration.secrets.DatacatSecretsBackend
   VOLUME_ID: 6b58c3a6-691b-496a-8afd-153637c2de48
   DOCKER_TLS_CERTDIR: ""
