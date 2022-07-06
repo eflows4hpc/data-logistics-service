@@ -19,4 +19,4 @@ class AirflowDataCatPlugin(AirflowPlugin):
     flask_blueprints = []
     hooks = []
     admin_views = []
-    appbuilder_menu_items = [{"name": "Data Catalogue", "href": "https://datacatalog.fz-juelich.de/index.html"}]
+    appbuilder_menu_items = [{"name": "Data Catalogue", "href": "https://datacatalogue.eflows4hpc.eu/index.html"}]
