@@ -1,6 +1,7 @@
 requests
 urllib3
 plyvel
+webdavclient3
 apache-airflow-providers-ssh
 apache-airflow-providers-http
 apache-airflow-providers-sftp

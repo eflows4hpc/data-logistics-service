@@ -38,20 +38,12 @@ def create_template(hrespo):
         "open_access": hrespo['open_access'] == "True"
     }
 
-
-@dag(default_args=default_args, schedule_interval=None, start_date=days_ago(2), tags=['example'])
-def upload_example():
-
-    @task()
-    def load(connection_id, **kwargs):
-        params = kwargs['params']
-        target = Variable.get("working_dir", default_var='/tmp/')
-        source = params.get('source', '/tmp/')
-
-        ssh_hook = get_connection(conn_id=connection_id, **kwargs)
-        with ssh_hook.get_conn() as ssh_client:
+def ssh2local_copy(ssh_hook, source: str, target: str):
+    with ssh_hook.get_conn() as ssh_client:
             sftp_client = ssh_client.open_sftp()
             lst = sftp_client.listdir(path=source)
+            
+            print(f"{len(lst)} objects in {source}")
             mappings = dict()
             for fname in lst:
                 local = tempfile.mktemp(prefix='dls', dir=target)
@@ -61,10 +53,23 @@ def upload_example():
                     print(f"{full_name} is a directory. Skipping")
                     continue
 
-                print(f"Copying {connection_id}:{full_name} --> {local}")
-                sftp_client.get(os.path.join(source, fname), local)
+                print(f"Copying {full_name} --> {local}")
+                sftp_client.get(full_name, local)
                 mappings[local] = fname
 
+    return mappings
+
+@dag(default_args=default_args, schedule_interval=None, start_date=days_ago(2), tags=['example'])
+def upload_example():
+
+    @task()
+    def load(connection_id, **kwargs):
+        params = kwargs['params']
+        target = Variable.get("working_dir", default_var='/tmp/')
+        source = params.get('source', '/tmp/')
+        ssh_hook = get_connection(conn_id=connection_id, **kwargs)
+        
+        mappings = ssh2local_copy(ssh_hook=ssh_hook, source=source, target=target)
         return mappings
 
     @task()
@@ -135,7 +140,7 @@ def upload_example():
         except ConnectionError as e:
             print('Registration failed', e)
             return -1
-
+    
     setup_task = PythonOperator(python_callable=setup, task_id='setup_connection')
     a_id = setup_task.output['return_value']
 
@@ -146,7 +151,7 @@ def upload_example():
                         'conn_id': a_id}, task_id='cleanup')
 
     reg = register(object_url=uid)
-
+    
     setup_task >> files >> uid >> reg >> en
 
 
