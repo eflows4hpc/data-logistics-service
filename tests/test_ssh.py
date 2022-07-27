@@ -1,44 +1,11 @@
-import imp
-from importlib.resources import path
-
+import tempfile
 import unittest
-#from unittest.mock import Mock, patch
-from dags.uploadflow import ssh2local_copy
-#from airflow.providers.ssh.hooks.ssh import SSHHook
 from unittest.mock import MagicMock, patch
-#from paramiko.client import SSHClient
-#from paramiko.sftp_client import SFTPClient
+import os
 
+from dags.uploadflow import ssh2local_copy, copy_streams
 
-
-"""
-def ssh2local_copy(ssh_hook, source: str, target: str):
-    with ssh_hook.get_conn() as ssh_client:
-            sftp_client = ssh_client.open_sftp()
-            lst = sftp_client.listdir(path=source)
-            
-            print(f"{len(lst)} objects in {source}")
-            mappings = dict()
-            for fname in lst:
-                local = tempfile.mktemp(prefix='dls', dir=target)
-                full_name = os.path.join(source, fname)
-                sts = sftp_client.stat(full_name)
-                if str(sts).startswith('d'):
-                    print(f"{full_name} is a directory. Skipping")
-                    continue
-
-                print(f"Copying {full_name} --> {local}")
-                sftp_client.get(full_name, local)
-                mappings[local] = fname
-
-    return mappings
-
-
-"""
 class TestSSH(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        pass
 
     @patch('dags.uploadflow.tempfile.mktemp')
     def test_copy_files(self, tmp):
@@ -48,20 +15,60 @@ class TestSSH(unittest.TestCase):
         a = MagicMock()
         a.return_value = ['a', 'c']
         stat = MagicMock(side_effect=['elo', 'elo'])
-        cpy = MagicMock(return_value='')
+        cpy = MagicMock(return_value=False)
         my_hook.get_conn().__enter__().open_sftp().listdir = a
         my_hook.get_conn().__enter__().open_sftp().stat = stat
-        my_hook.get_conn().__enter__().open_sftp().get = cpy
+        my_hook.get_conn().__enter__().open_sftp().open().__enter__().raw.read = cpy
 
         mapps = ssh2local_copy(ssh_hook=my_hook, source='srcZ', target='trg')
         my_hook.get_conn.assert_any_call()
         a.assert_called_once_with(path='srcZ')
-        cpy.assert_any_call('srcZ/a', 'tmpA')
-        cpy.assert_any_call('srcZ/c', 'tmpB')
+        cpy.assert_called()
 
         print(mapps)
         self.assertEqual(len(mapps), 2)
-        
-        
 
+
+    @patch('dags.uploadflow.tempfile.mktemp')
+    def test_skipdir_files(self, tmp):
+        tmp.side_effect = ['tmpA', 'tmpB']
+
+        my_hook = MagicMock()
+        a = MagicMock()
+        a.return_value = ['a', 'c']
+        stat = MagicMock(side_effect=['elo', 'd elo'])
+        cpy = MagicMock(return_value=False)
+        my_hook.get_conn().__enter__().open_sftp().listdir = a
+        my_hook.get_conn().__enter__().open_sftp().stat = stat
+        my_hook.get_conn().__enter__().open_sftp().open().__enter__().raw.read = cpy
+
+        mapps = ssh2local_copy(ssh_hook=my_hook, source='srcZ', target='trg')
+        my_hook.get_conn.assert_any_call()
+        a.assert_called_once_with(path='srcZ')
+        cpy.assert_called()
         
+        print(mapps)
+        
+        self.assertEqual(len(mapps), 1)
+
+
+    def test_copy_streams(self):
+        """
+        def copy_streams(input, output):
+        """
+        with tempfile.TemporaryDirectory() as dir:
+            text = 'Some input text'
+            input_name = os.path.join(dir,'input.txt')
+            output_name = os.path.join(dir, 'output')
+            with open(input_name, 'w') as fln:
+                fln.write(text)
+
+            with open(input_name, 'rb') as input:
+                with open(output_name, 'wb') as output:
+                    copy_streams(input=input, output=output)
+
+            with open(output_name, 'r') as f:
+                txt = f.read()
+                print("Read following: ", txt)
+
+                self.assertEqual(text, txt)

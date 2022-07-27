@@ -38,24 +38,41 @@ def create_template(hrespo):
         "open_access": hrespo['open_access'] == "True"
     }
 
+def copy_streams(input, output, chunk_size = 1024 * 1000):
+    while True:
+        chunk=input.raw.read(chunk_size)
+        if not chunk:
+            break
+        content_to_write = memoryview(chunk)
+        output.write(content_to_write)
+
+
+def ssh_download(sftp_client, remote, local):
+    #sftp_client.get(remote, local)
+    with sftp_client.open(remote, 'rb') as input:
+        with open(local, 'wb') as output:
+            input.set_pipelined(pipelined=True)
+            copy_streams(input=input, output=output)
+
+
 def ssh2local_copy(ssh_hook, source: str, target: str):
     with ssh_hook.get_conn() as ssh_client:
-            sftp_client = ssh_client.open_sftp()
-            lst = sftp_client.listdir(path=source)
-            
-            print(f"{len(lst)} objects in {source}")
-            mappings = dict()
-            for fname in lst:
-                local = tempfile.mktemp(prefix='dls', dir=target)
-                full_name = os.path.join(source, fname)
-                sts = sftp_client.stat(full_name)
-                if str(sts).startswith('d'):
-                    print(f"{full_name} is a directory. Skipping")
-                    continue
+        sftp_client = ssh_client.open_sftp()
+        lst = sftp_client.listdir(path=source)
+        
+        print(f"{len(lst)} objects in {source}")
+        mappings = dict()
+        for fname in lst:
+            local = tempfile.mktemp(prefix='dls', dir=target)
+            full_name = os.path.join(source, fname)
+            sts = sftp_client.stat(full_name)
+            if str(sts).startswith('d'):
+                print(f"{full_name} is a directory. Skipping")
+                continue
 
-                print(f"Copying {full_name} --> {local}")
-                sftp_client.get(full_name, local)
-                mappings[local] = fname
+            print(f"Copying {full_name} --> {local}")
+            ssh_download(sftp_client=sftp_client, remote=full_name, local=local)
+            mappings[local] = fname
 
     return mappings
 
@@ -68,7 +85,7 @@ def upload_example():
         target = Variable.get("working_dir", default_var='/tmp/')
         source = params.get('source', '/tmp/')
         ssh_hook = get_connection(conn_id=connection_id, **kwargs)
-        
+
         mappings = ssh2local_copy(ssh_hook=ssh_hook, source=source, target=target)
         return mappings
 

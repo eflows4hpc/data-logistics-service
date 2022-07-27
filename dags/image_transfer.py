@@ -4,6 +4,7 @@ import requests
 from airflow.decorators import dag, task
 from airflow.utils.dates import days_ago
 from airflow.operators.python import PythonOperator
+from dags.uploadflow import copy_streams
 
 from decors import setup, get_connection, remove
 
@@ -21,6 +22,7 @@ def file_exist(sftp, name):
 @dag(default_args=default_args, schedule_interval=None, start_date=days_ago(2), tags=['example'])
 def transfer_image():
 
+    
     @task
     def stream_upload(connection_id, **kwargs):
         params = kwargs['params']
@@ -47,12 +49,7 @@ def transfer_image():
             with requests.get(url, stream=True, verify=False) as r:
                 with sftp_client.open(remote_name, 'wb') as f:
                     f.set_pipelined(pipelined=True)
-                    while True:
-                        chunk=r.raw.read(1024 * 1000)
-                        if not chunk:
-                            break
-                        content_to_write = memoryview(chunk)
-                        f.write(content_to_write)
+                    copy_streams(input=r, output=f)
                     
     setup_task = PythonOperator(
         python_callable=setup, task_id='setup_connection')
