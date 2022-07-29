@@ -2,7 +2,7 @@
 # @author Maria Petrova & Christian Böttcher
 ## USAGE:
 #
-# deployment.sh <user_home_directory> <git_directory> [SERVER_DOMAIN] [AIRFLOW__SECRETS__BACKEND] [AIRFLOW__SECRETS__BACKEND_KWARGS]
+# deployment.sh <user_home_directory> <git_directory> [SERVER_DOMAIN] [AIRFLOW__SECRETS__BACKEND] [AIRFLOW__SECRETS__BACKEND_KWARGS] [AIRFLOW__CORE__FERNET_KEY] [DAG_GIT_URL]
 
 OLD_DIR=`pwd`
 GIT_REPO=$HOME/data-logistics-service
@@ -15,6 +15,7 @@ if [ -z ${3+x} ]; then export SERVER_DOMAIN=dls.fz-juelich.de; else export SERVE
 if [ -z ${4+x} ]; then unset AIRFLOW__SECRETS__BACKEND; else export AIRFLOW__SECRETS__BACKEND=$4; fi
 if [ -z ${5+x} ]; then unset AIRFLOW__SECRETS__BACKEND_KWARGS; else export AIRFLOW__SECRETS__BACKEND_KWARGS=$5; fi
 if [ -z ${6+x} ]; then unset AIRFLOW__CORE__FERNET_KEY; else export AIRFLOW__CORE__FERNET_KEY=$6; fi
+if [ -z ${6+x} ]; then unset DAG_GIT_URL; else export DAG_GIT_URL=$7; fi
 
 
 
@@ -22,6 +23,7 @@ echo "DEBUG values: OLD_DIR=$OLD_DIR, ENTRYPOINT_DIR=$ENTRYPOINT and GIT_REPO=$G
 echo "DEBUG using secrets backend: $AIRFLOW__SECRETS__BACKEND"
 echo "DEBUG backend args length: ${#AIRFLOW__SECRETS__BACKEND_KWARGS}"
 #echo "DEBUG fernet key: ${AIRFLOW__CORE__FERNET_KEY}"
+echo "DEBUG DAG git dir: $DAG_GIT_URL"
 
 
 cd $ENTRYPOINT
@@ -38,7 +40,7 @@ echo "Proceeding as user $(whoami)"
 # Make the necessary folders for the airflow artefacts and copy the corresponging content
 mkdir -p ./dags ./logs ./plugins ./config ./templates
 cd $GIT_REPO
-cp -r dags/* $AIRFLOW_DIR/dags
+rm -rf $AIRFLOW_DIR/dags/* && rm -rf $AIRFLOW_DIR/dags/.git && git clone $DAG_GIT_URL $AIRFLOW_DIR/dags
 cp -r plugins/* $AIRFLOW_DIR/plugins
 cp config/* $AIRFLOW_DIR/config/
 cp -r templates/* $AIRFLOW_DIR/templates
