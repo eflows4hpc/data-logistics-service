@@ -1,3 +1,5 @@
+WORKER_DATA_LOCATION = '/wf_pipeline_data/userdata'
+
 def get_dockercmd(params:dict, location):
     """A task which runs in the docker worker and spins up a docker container with the an image and giver parameters.
 
