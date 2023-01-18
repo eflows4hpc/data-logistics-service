@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/447551112.svg)](https://zenodo.org/badge/latestdoi/447551112)
+
 # Data Logistics Service
 
 eFlows4HPC Data Logistics Service
