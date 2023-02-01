@@ -40,7 +40,7 @@ echo "Proceeding as user $(whoami)"
 # Make the necessary folders for the airflow artefacts and copy the corresponging content
 mkdir -p ./dags ./logs ./plugins ./config ./templates
 cd $GIT_REPO
-rm -rf $AIRFLOW_DIR/dags/* && rm -rf $AIRFLOW_DIR/dags/.git && git clone $DAG_GIT_URL $AIRFLOW_DIR/dags
+rm -rf $AIRFLOW_DIR/dags/* && rm -rf $AIRFLOW_DIR/dags/.git && rm -rf $AIRFLOW_DIR/dags/.gitignore  && git clone $DAG_GIT_URL $AIRFLOW_DIR/dags
 cp -r plugins/* $AIRFLOW_DIR/plugins
 cp config/* $AIRFLOW_DIR/config/
 cp -r templates/* $AIRFLOW_DIR/templates
