@@ -24,9 +24,11 @@
 # The following variables are supported:
 #
 # AIRFLOW_IMAGE_NAME           - Docker image name used to run Airflow.
-#                                Default: apache/airflow:2.2.1
+#                                Default: apache/airflow:2.5.1
 # AIRFLOW_UID                  - User ID in Airflow containers
 #                                Default: 50000
+# AIRFLOW_PROJ_DIR             - Base path to which all the files will be volumed.
+#                                Default: .
 # Those configurations are useful mostly in case of standalone testing/running Airflow in test/try-out mode
 #
 # _AIRFLOW_WWW_USER_USERNAME   - Username for the administrator account (if requested).
@@ -44,26 +46,27 @@ x-airflow-common:
   # In order to add custom dependencies or upgrade provider packages you can use your extended image.
   # Comment the image line, place your Dockerfile in the directory where you placed the docker-compose.yaml
   # and uncomment the "build" line below, Then run `docker-compose build` to build the images.
-  image: ${AIRFLOW_IMAGE_NAME:-registry.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service/eflows-airflow}
+  image:  ${AIRFLOW_IMAGE_NAME:-registry.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service/eflows-airflow}
   # build: .
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
     AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
     AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
     AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
     AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW__CORE__FERNET_KEY}
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
-    AIRFLOW__API__AUTH_BACKEND: 'airflow.api.auth.backend.basic_auth'
+    AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
     AIRFLOW__SECRETS__BACKEND_KWARGS: ${AIRFLOW__SECRETS__BACKEND_KWARGS}
     AIRFLOW__SECRETS__BACKEND: ${AIRFLOW__SECRETS__BACKEND}
-#    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
   volumes:
-    - ./dags:/opt/airflow/dags
+    - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
     - ./config/airflow.cfg:/opt/airflow/airflow.cfg
-    - /persistent_data/logs:/opt/airflow/logs
-    - ./plugins:/opt/airflow/plugins
+    - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
+    - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -73,10 +76,11 @@ x-airflow-common:
       condition: service_healthy
 
 services:
-
   reverse-proxy:
     image: "jwilder/nginx-proxy:alpine"
     container_name: "reverse-proxy"
+    profiles:
+      - full
     volumes:
       - "html:/usr/share/nginx/html"
       - "dhparam:/etc/nginx/dhparam"
@@ -91,6 +95,8 @@ services:
   letsencrypt:
     image: "jrcs/letsencrypt-nginx-proxy-companion:latest"
     container_name: "letsencrypt-helper"
+    profiles:
+      - full
     volumes:
       - "html:/usr/share/nginx/html"
       - "dhparam:/etc/nginx/dhparam"
@@ -114,7 +120,7 @@ services:
       - postgres-db-volume:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "airflow"]
-      interval: 60s
+      interval: 10s
       retries: 5
     restart: always
 
@@ -124,23 +130,21 @@ services:
       - 6379
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 60s
+      interval: 10s
       timeout: 30s
       retries: 50
     restart: always
 
   airflow-webserver:
     <<: *airflow-common
-    command: webserver
-    ports:
-      - 7001:8080
-    
     environment:
       <<: *airflow-common-env
       VIRTUAL_HOST: datalogistics.eflows4hpc.eu
       LETSENCRYPT_HOST: datalogistics.eflows4hpc.eu
       VIRTUAL_PORT: 8080
-
+    command: webserver
+    ports:
+      - 8080:8080
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 60s
@@ -173,7 +177,7 @@ services:
       test:
         - "CMD-SHELL"
         - 'celery --app airflow.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}"'
-      interval: 30s
+      interval: 60s
       timeout: 10s
       retries: 5
     environment:
@@ -183,10 +187,11 @@ services:
       DUMB_INIT_SETSID: "0"
     restart: always
     volumes:
-      - ./dags:/opt/airflow/dags
-      - ./config/airflow.cfg:/opt/airflow/airflow.cfg
-      - /persistent_data/logs:/opt/airflow/logs
-      - ./tmp/:/work/
+       - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
+       - ./config/airflow.cfg:/opt/airflow/airflow.cfg
+       - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
+       - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
+       - ./tmp/:/work/
     depends_on:
       <<: *airflow-common-depends-on
       airflow-init:
@@ -197,14 +202,9 @@ services:
     command: triggerer
     healthcheck:
       test: ["CMD-SHELL", 'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"']
-      interval: 60s
+      interval: 10s
       timeout: 10s
       retries: 5
-    environment:
-      <<: *airflow-common-env
-      # Required to handle warm shutdown of the celery workers properly
-      # See https://airflow.apache.org/docs/docker-stack/entrypoint.html#signal-propagation
-      DUMB_INIT_SETSID: "0"
     restart: always
     depends_on:
       <<: *airflow-common-depends-on
@@ -225,12 +225,13 @@ services:
     environment:
       <<: *airflow-common-env
       _AIRFLOW_DB_UPGRADE: 'true'
-      #_AIRFLOW_WWW_USER_CREATE: 'true'
+      _AIRFLOW_WWW_USER_CREATE: 'true'
       _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
       _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
+      _PIP_ADDITIONAL_REQUIREMENTS: ''
     user: "0:0"
     volumes:
-      - .:/sources
+      - ${AIRFLOW_PROJ_DIR:-.}:/sources
 
   airflow-cli:
     <<: *airflow-common
@@ -245,24 +246,6 @@ services:
       - -c
       - airflow
 
-  airflow-setup:
-    <<: *airflow-common
-    environment:
-      <<: *airflow-common-env
-      CONNECTION_CHECK_MAX_COUNT: "0"
-    entrypoint: /bin/bash
-    command:
-      - -c
-      - |
-        exec /entrypoint airflow variables import /opt/airflow/variables.json
-        echo "Variables added"
-    volumes:
-      - ./dockers/variables.json:/opt/airflow/variables.json
-    depends_on:
-      <<: *airflow-common-depends-on
-      airflow-init:
-        condition: service_completed_successfully
-
 volumes:
   postgres-db-volume:
     external: true
@@ -273,4 +256,3 @@ volumes:
   html:
   vhost:
   dhparam:
-
