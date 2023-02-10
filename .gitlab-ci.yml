@@ -79,8 +79,8 @@ full-deploy-production:
     - openstack server add volume $INSTANCE_ID $VOLUME_ID
     - sleep 20 # apparently it may take some time until the volume is available to the OS
     - while [ "`ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP ls `" ]; do sleep 5; done
-    - ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "sudo mkdir -p /persistent_data && sudo mount /dev/vdb1 /persistent_data"
     - until ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP ls /finished_cloudinit >/dev/null 2>&1; do sleep 30; done # wait until cloudinit script is complete
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "sudo mkdir -p /persistent_data && sudo mount /dev/vdb1 /persistent_data"
     - ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "sudo service docker restart" # to use the configured docker data path
     - ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $PRODUCTION_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS $AIRFLOW_FERNET_KEY $DAG_GIT_URL"
     - echo "Done"
