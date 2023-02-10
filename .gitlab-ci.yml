@@ -78,6 +78,7 @@ full-deploy-production:
     # do the mount /dev/vdb1 stuff
     - openstack server add volume $INSTANCE_ID $VOLUME_ID
     - sleep 20 # apparently it may take some time until the volume is available to the OS
+    - while [ "`ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP ls `" ]; do sleep 5; done
     - ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "sudo mkdir -p /persistent_data && sudo mount /dev/vdb1 /persistent_data"
     - until ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP ls /finished_cloudinit >/dev/null 2>&1; do sleep 30; done # wait until cloudinit script is complete
     - ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "sudo service docker restart" # to use the configured docker data path
@@ -97,7 +98,7 @@ light-deploy-production:
   <<: *ssh_setup
   environment: Production
   script:
-    - ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "cd /home/airflow/data-logistics-service && git stash && git stash clear && git checkout main && git checkout -f $CI_COMMIT_TAG && git pull --all"
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "cd /home/airflow/data-logistics-service && git stash && git stash clear && git checkout main && git checkout -f $CI_COMMIT_TAG && git pull --all && rm -rf dags && git clone https://github.com/eflows4hpc/dls-dags.git dags"
     - ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $PRODUCTION_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS $AIRFLOW_FERNET_KEY $DAG_GIT_URL"
 
 test-production-webserver:
