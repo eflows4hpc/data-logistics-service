@@ -2,6 +2,11 @@
 
 # This is a cloud config that install most basic packages, and clones and prepares the git repo for the datacatalog
 # This should prepare everything that is possible, so that (after assigning the ip address and generating the static files) only docker-compose needs to be run
+#cloud-config
+apt:
+  primary:
+    - arches: [default]
+      uri: http://de.archive.ubuntu.com/ubuntu/
 
 # upgrade packages
 package_update: true
