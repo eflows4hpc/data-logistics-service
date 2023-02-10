@@ -29,7 +29,6 @@ variables:
     - chmod 700 ~/.ssh
 
 stages:
-  - test
   - build   
   - publish
   - deploy

@@ -28,15 +28,14 @@ users:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDrgXm/3kbHrgPuHrru2LCLxKBPNnZkwTSbaadkYm6N+EzE7GwVPcXorPReC+2SHT2e8YnczcjHMcazmf7VWmHAQVV3fGrZiQtk+xTjXt3tC+Rm2zuqB4vvJcR5DXXomMMRJwG3sk/PcozvFfKFv6P7bbHxKOR090o4krM3mE2Vo43EnsBaPUS8cWI2EkhcR4gAJHhreFHbIS+nrFaJydfmzfwHNE1WjjtfIBA0U8ld2tk8eelMUjvkWrYXK+qqdaUKL0n/wVMo8D/Kl1lNGKym8LE6ZiojjEX0Aq0ajSHyyEWGscJunv/tJkrrOX2C4jd9pGEP6d0YyAunimsT1glv cboet@Desktop-CB
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCRsldcJ7kiksXTn2hivYfZ+Y9gziBWaMPpfVPNVlPi5XizbMurXAPQ3gUbBTDRp+Plf5LiXAfFNBdPTACb5ymFhIUKj/3sJhxc92uvJktLyjObAZ74ImBzDhVwGzs/cKhWc2otFgyMwrfPuIxdarCiLTjmG+dZ0a+IZbWta241kc3qBPjuqKK/LSZOK/Jx9Dl4rURs780GdcoA7Q2r6I6Bq8m0Cpfl2Otwi5Vr4d6hxWrl8D100ssLctn4FlL4SzVHPyZJVNeFJYQv1boJwldHBST8tJ0r0KC1V5CboB+Rdh1b/Qy1y6l/y9fPX+axFSGIIxSb6egRSwcE89f3kCC1 cboettcher@zam024
 
-
-  - name: mpetrova
-    gecos: Maria Petrova-El Sayed
+  - name: jj
+    gecos: Jedrzej Rybicki
     groups: sudo, docker
     shell: /bin/bash
     sudo: ALL=(ALL) NOPASSWD:ALL
     lock_passwd: true
     ssh_authorized_keys:
-      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDUNFmYnaZ1raXQm04/mfdoBfn4i6xYknic2nhGDOrkhp5r6kv4F1m7wgtuL/pddRKuEoQpiXjRWciEMljFmxvVc7+9VitsAn5zBsnzY9+Sq9+si5aKe93RK8JGLX/WsfZGnPMdKPkK2GO9LFJN4TyL9hTpFdFQfxtO82NIa3WikG4RI+WQuKeQ4qr8FHNymr+gHTw/+YaM9331xnM5YqkmOC27CvVtiQx96MNMAyMQ8RJcHy1GL8donTBL+knVZdIwGt4SUy9dIF8iwTXGFkLe8V7/DIEB7RW9gvk2sG3YPo2eq56HsQKAB3yre+5QFhmH/uqUnTKVFgZLqlDUC0duFOwALCRmlEgtOeZqOzRBa6a0RveTIfccMb48ac4FpeeJdo4KId1QO1JaEZ8fYKgRVw3xRuOjDMpxCFuxELpSvx/hd1jgrK9lRizH9DXNf5/5Go2O16hj8LPufBbhX2EiChjWJEJkoRWBhQ3UHmstbqRiuNU/MsHq0FPSHMHV6BU= maria@jsc-strela
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCxPi4EYQLBxFOECG3m8/yv4Qq0iByEirxoVBM/BkR3nbVrCLCB7L+gKKgLL36jOnkZKHyXRcRA94or8sUHrIRKH3o4ubnCKK/j2MEojGOj90QJiV5VaZ0jaHpo8IxKuYBZQR95B+l5Jpfn02nIEq0C7pdDmuV73Igl07eakmn07EFezWKzMDFcTfU5KLx/OyTYgNfVBTUqwc0nUEKqSe/b0WmY34nHnIXDPjg+eXNDMQrAl6j8cVUeJs57lZFdDNTacoZCune3z1UZ4N3X+rQvdvZ04GjAJPAlYaaJ21eeIrAyt65A1H3bT8OFfU5vK9Fi+2uA0yqFgCooDrUQFsdF
 
   - name: airflow
     gecos: Common user for running the airflow services
