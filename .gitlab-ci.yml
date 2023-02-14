@@ -64,7 +64,7 @@ full-deploy-testing:
   stage: deploy
   environment: Testing
   rules:
-    - if: ($CI_COMMIT_BRANCH == "master" && $MANUAL_FULL_DEPLOY_TESTING == "true")
+    - if: ($CI_COMMIT_BRANCH == "main" && $MANUAL_FULL_DEPLOY_TESTING == "true")
   <<: *ssh_setup
   script:
     - echo "Starting the full testing deployment of airflows."
@@ -88,7 +88,7 @@ full-deploy-testing:
 light-deploy-testing:
   stage: deploy
   rules:
-    - if: ($CI_COMMIT_BRANCH == "master" && ($MANUAL_FULL_DEPLOY_TESTING == "" || $MANUAL_FULL_DEPLOY_TESTING == "false"))
+    - if: ($CI_COMMIT_BRANCH == "main" && ($MANUAL_FULL_DEPLOY_TESTING == "" || $MANUAL_FULL_DEPLOY_TESTING == "false"))
 
   <<: *ssh_setup
   environment: Testing
