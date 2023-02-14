@@ -88,8 +88,7 @@ full-deploy-testing:
 light-deploy-testing:
   stage: deploy
   rules:
-    - if: $MANUAL_FULL_DEPLOY_TESTING == "" || $MANUAL_FULL_DEPLOY_TESTING == "false"
-      when: tags
+    - if: ($CI_COMMIT_BRANCH == "master" && ($MANUAL_FULL_DEPLOY_TESTING == "" || $MANUAL_FULL_DEPLOY_TESTING == "false))"
   <<: *ssh_setup
   environment: Testing
   script:
@@ -102,8 +101,7 @@ full-deploy-production:
   stage: deploy
   environment: Production
   rules:
-     - if: $MANUAL_FULL_DEPLOY_PRODUCTION == "true"
-       when: tags
+     - if: ($CI_COMMIT_TAG =~ /stable/ && $MANUAL_FULL_DEPLOY_PRODUCTION == "true")
   <<: *ssh_setup
   script:
     - echo "Starting the full production deployment of airflows."
@@ -133,7 +131,7 @@ full-deploy-production:
 light-deploy-production:
   stage: deploy
   rules:
-    - if: $MANUAL_FULL_DEPLOY_PRODUCTION == "" || $MANUAL_FULL_DEPLOY_PRODUCTION == "false"
+    - if: ($CI_COMMIT_TAG =~ /stable/ && ($MANUAL_FULL_DEPLOY_PRODUCTION == "" || $MANUAL_FULL_DEPLOY_PRODUCTION == "false"))
       when: tags
   <<: *ssh_setup
   environment: Production
