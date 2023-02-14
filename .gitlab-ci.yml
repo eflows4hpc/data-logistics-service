@@ -88,7 +88,8 @@ full-deploy-testing:
 light-deploy-testing:
   stage: deploy
   rules:
-    - if: ($CI_COMMIT_BRANCH == "master" && ($MANUAL_FULL_DEPLOY_TESTING == "" || $MANUAL_FULL_DEPLOY_TESTING == "false))"
+    - if: ($CI_COMMIT_BRANCH == "master" && ($MANUAL_FULL_DEPLOY_TESTING == "" || $MANUAL_FULL_DEPLOY_TESTING == "false"))
+
   <<: *ssh_setup
   environment: Testing
   script:
@@ -101,7 +102,6 @@ full-deploy-production:
   stage: deploy
   environment: Production
   rules:
-     - if: ($CI_COMMIT_TAG =~ /stable/ && $MANUAL_FULL_DEPLOY_PRODUCTION == "true")
   <<: *ssh_setup
   script:
     - echo "Starting the full production deployment of airflows."
@@ -132,7 +132,6 @@ light-deploy-production:
   stage: deploy
   rules:
     - if: ($CI_COMMIT_TAG =~ /stable/ && ($MANUAL_FULL_DEPLOY_PRODUCTION == "" || $MANUAL_FULL_DEPLOY_PRODUCTION == "false"))
-      when: tags
   <<: *ssh_setup
   environment: Production
   script:
@@ -142,8 +141,9 @@ light-deploy-production:
 test-production-webserver:
   cache: {}
   stage: test-deployment 
-  only:
-    - tags
+  rules:
+    - if: ($CI_COMMIT_TAG =~ /stable/ && ($MANUAL_FULL_DEPLOY_PRODUCTION == "" || $MANUAL_FULL_DEPLOY_PRODUCTION == "false"))
+    - if: ($CI_COMMIT_TAG =~ /stable/ && $MANUAL_FULL_DEPLOY_PRODUCTION == "true")
   script:
     - apt update && apt -y install curl
     - echo "This is a simple check if the deployment was successful and dags get executed"
