@@ -85,7 +85,7 @@ full-deploy-testing:
     - ssh -oStrictHostKeyChecking=accept-new airflow@$PTESTING_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $TESTING_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS $AIRFLOW_FERNET_KEY $DAG_GIT_URL"
     - echo "Done"
   
-  light-deploy-testing:
+light-deploy-testing:
   stage: deploy
   rules:
     - if: $MANUAL_FULL_DEPLOY_TESTING == "" || $MANUAL_FULL_DEPLOY_TESTING == "false"
