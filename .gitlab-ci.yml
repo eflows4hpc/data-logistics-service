@@ -17,6 +17,11 @@ variables:
   DAG_GIT_URL: https://github.com/eflows4hpc/dls-dags
   VOLUME_ID: 6b58c3a6-691b-496a-8afd-153637c2de48
   DOCKER_TLS_CERTDIR: ""
+  TESTING_IP: 134.94.199.115
+  OLD_TEST_NAME: old-airflow-testing
+  TESTING_NAME: airflow-testing
+  TESTING_URL: https://zam10115.zam.kfa-juelich.de
+  TESTING_DOMAIN: zam10115.zam.kfa-juelich.de
 
 
 # before script copied from gitlab docs
@@ -77,15 +82,53 @@ build-custom-image:
     - docker tag $IMAGE_COMMIT_TAG $IMAGE_LATEST_TAG
     - docker push $IMAGE_LATEST_TAG
 
+full-deploy-testing:
+  stage: deploy
+  environment: Testing
+  rules:
+    - if: ($CI_COMMIT_BRANCH == "master" && $MANUAL_FULL_DEPLOY_TESTING == "true")
+  <<: *ssh_setup
+  script:
+    - echo "Starting the full testing deployment of airflows."
+    - pip install python-openstackclient
+    - OLD_ID=`openstack server show $TESTING_NAME -f value -c id` && server_exists=true || echo "No testing server found. It might be a first time deployment"
+#    - if [ "$server_exists" = true ] ; then
+#      ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "sudo docker-compose -f /home/airflow/data-logistics-service/dockers/docker-compose.yaml --project-directory /home/airflow/eflows-airflow down"
+#      openstack server set --name $OLD_TEST_NAME $OLD_ID;
+#      fi
+    - openstack server remove volume $OLD_ID $VOLUME_ID
+    - INSTANCE_ID=`openstack server create -f value -c id --prefix IMAGE_ --flavor l2 --image 149a65b5-aeb8-499f-aaa6-ec966bd28dd6 --user-data scripts/cloudinit.yml --security-group ssh --security-group www --security-group https $TESTING_NAME`
+    - while [ "`openstack server show $INSTANCE_ID -c addresses -f value`" = "{}" ]; do sleep 5; done # wait until an address is available to attach the floating ip
+    - openstack server add floating ip $INSTANCE_ID $TESTING_IP
+    - sleep 10 # ensure that next command reaches the new server, prevents host key problems
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "sudo mkdir -p /persistent_data"
+    - until ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP ls /finished_cloudinit >/dev/null 2>&1; do sleep 30; done # wait until cloudinit script is complete
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "sudo service docker restart" # to use the configured docker data path
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$PTESTING_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $TESTING_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS $AIRFLOW_FERNET_KEY $DAG_GIT_URL"
+    - echo "Done"
+  
+  light-deploy-testing:
+  stage: deploy
+  rules:
+    - if: $MANUAL_FULL_DEPLOY_TESTING == "" || $MANUAL_FULL_DEPLOY_TESTING == "false"
+      when: tags
+  <<: *ssh_setup
+  environment: Testing
+  script:
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "cd /home/airflow/data-logistics-service && git stash && git stash clear && git checkout main && git checkout -f $CI_COMMIT_TAG && git pull --all"
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $TESTING_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS $AIRFLOW_FERNET_KEY $DAG_GIT_URL"
+
+
 
 full-deploy-production:
   stage: deploy
   environment: Production
-  only: 
-    - web
+  rules:
+     - if: $MANUAL_FULL_DEPLOY_PRODUCTION == "true"
+       when: tags
   <<: *ssh_setup
   script:
-    - echo "Starting the full testing deployment of airflows example."
+    - echo "Starting the full production deployment of airflows."
     - pip install python-openstackclient
     - OLD_ID=`openstack server show $PRODUCTION_NAME -f value -c id` && server_exists=true || echo "No production server found. It might be a first time deployment"
 #    - if [ "$server_exists" = true ] ; then
@@ -110,12 +153,9 @@ full-deploy-production:
 # TODO Add proper tests
 light-deploy-production:
   stage: deploy
-  # only run when master is updated, unless the pipeline was triggered via the web UI
-  only:
-    - main
-  except:
-    - tags
-    - web
+  rules:
+    - if: $MANUAL_FULL_DEPLOY_PRODUCTION == "" || $MANUAL_FULL_DEPLOY_PRODUCTION == "false"
+      when: tags
   <<: *ssh_setup
   environment: Production
   script:
@@ -126,8 +166,6 @@ test-production-webserver:
   cache: {}
   stage: test-deployment 
   only:
-    - web # and master
-  except:
     - tags
   script:
     - apt update && apt -y install curl
@@ -144,8 +182,9 @@ cleanup-successful-full-deployment:
   # check if there is an old prod or test instance, and delete it if present
   stage: cleanup
   when: on_success
-  only:
-    - web
+  rules:
+     - if: $MANUAL_FULL_DEPLOY_PRODUCTION == "true"
+       when: tags
   script:
     - echo "This is the cleanup for the full-redeployment of the testing or production servers"
     - echo "if this job is reached, all earlier jobs were successful, and any lingering old instances need to be removed"
@@ -158,8 +197,9 @@ cleanup-failed-full-deployment:
   # this does not guarantee a successful rollback, but unless the old instance was faulty, this should work
   stage: cleanup
   when: on_failure
-  only:
-    - web
+  rules:
+     - if: $MANUAL_FULL_DEPLOY_PRODUCTION == "true"
+       when: tags
   <<: *ssh_setup
   script:
     - echo "This is the cleanup for the full-redeployment of the testing or production servers"
