@@ -50,7 +50,7 @@ export AIRFLOW_UID=$(id -u)
 
 pip install -r $GIT_REPO/requirements.txt
 
-sed -i "s_datalogistics.eflows4hpc.eu/_${SERVER_DOMAIN}_g" $GIT_REPO/dockers/docker-compose.yaml
+sed -i "s_datalogistics.eflows4hpc.eu_${SERVER_DOMAIN}_g" $GIT_REPO/dockers/docker-compose.yaml
 
 # it is at this point assumed that ip and volume are correctly assigned, and that dns is working properly
 echo "-----------Bringing up the docker containers-----------"
