@@ -50,3 +50,12 @@ Connections can also be added through env variables, like
 ```
 AIRFLOW_CONN_MY_PROD_DATABASE=my-conn-type://login:password@host:port/schema?param1=val1&param2=val2
 ```
+
+## CI/CD
+The gitlab repository is set up to automatically build the customized airflow image and deploy to the production and testing environment. The pipeline and jobs for this are defined in the [.gitlab-ci.yml](.gitlab-ci.yml) file.
+In general, pushes to the main branch update the testing deployment, and tags containing "stable" update the production deployment.
+
+Since the airflow image is pretty large, the docker image is only built when starting the job manually, to keep the docker registry at a reasonable size.
+
+To avoid unneeded downtime, the VMs hosting the deployments are usuallly not re-created, and instead only the updated airflow image, as well as updated airflow config is uploaded to the VM. After this, the docker containers are restarted.
+If a "full-deployment" is required (i.e. the VMs shuld be newly created), the pipeline has to be started with a variable ```MANUAL_FULL_DEPLOY=true```. This can be done while starting the pipeline via the web interface.
