@@ -152,7 +152,7 @@ test-production-webserver:
   cache: {}
   stage: test-deployment 
   rules:
-    - if: ($CI_COMMIT_TAG =~ /stable/
+    - if: $CI_COMMIT_TAG =~ /stable/
   script:
     - apt update && apt -y install curl
     - echo "This is a simple check if the deployment was successful and dags get executed"
