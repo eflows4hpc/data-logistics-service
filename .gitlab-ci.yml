@@ -49,8 +49,24 @@ debug:
     - echo $CI_COMMIT_TAG
     - echo $MANUAL_FULL_DEPLOY_PRODUCTION
 
+build-testing-image:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  when: manual
+  tags:
+    - laptop
+  variables:
+    IMAGE_COMMIT_TAG: $CI_REGISTRY_IMAGE/eflows-airflow:testing
+    
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build --no-cache=true --pull -t $IMAGE_COMMIT_TAG -f dockers/eflows-airflow.docker .
+    - docker push $IMAGE_COMMIT_TAG
 
-build-custom-image:
+
+build-production-image:
   stage: build
   image: docker:latest
   services:
@@ -91,6 +107,7 @@ full-deploy-testing:
     - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "sudo mkdir -p /persistent_data"
     - until ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP ls /finished_cloudinit >/dev/null 2>&1; do sleep 30; done # wait until cloudinit script is complete
     - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "sudo service docker restart" # to use the configured docker data path
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP 'sed -i "s_eflows-airflow:latest_eflows-airflow:testing_g" /home/airflow/data-logistics-service/dockers/docker-compose.yaml'
     - ssh -oStrictHostKeyChecking=accept-new airflow@$PTESTING_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $TESTING_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS $AIRFLOW_FERNET_KEY $DAG_GIT_URL"
     - echo "Done"
   
@@ -103,6 +120,7 @@ light-deploy-testing:
   environment: Testing
   script:
     - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "cd /home/airflow/data-logistics-service && git stash && git stash clear && git checkout main && git checkout -f $CI_COMMIT_TAG && git pull --all"
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP 'sed -i "s_eflows-airflow:latest_eflows-airflow:testing_g" /home/airflow/data-logistics-service/dockers/docker-compose.yaml'
     - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $TESTING_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS $AIRFLOW_FERNET_KEY $DAG_GIT_URL"
 
 
