@@ -54,7 +54,7 @@ export AIRFLOW_UID=$(id -u)
 pip install -r $GIT_REPO/requirements.txt
 
 sed -i "s_datalogistics.eflows4hpc.eu_${SERVER_DOMAIN}_g" $GIT_REPO/dockers/docker-compose.yaml
-sed -i "s/SSO_CLIENT_SECRET/${SSO_CLIENT_SECRET}/g" $AIRFLOW_DIR/client_secret.json
+sed -i "s/SSO_CLIENT_SECRET/${SSO_CLIENT_SECRET}/g" $AIRFLOW_DIR/client_secrets.json
 
 # it is at this point assumed that ip and volume are correctly assigned, and that dns is working properly
 echo "-----------Bringing up the docker containers-----------"
