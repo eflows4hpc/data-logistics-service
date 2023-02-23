@@ -2,7 +2,7 @@
 # @author Maria Petrova & Christian Böttcher
 ## USAGE:
 #
-# deployment.sh <user_home_directory> <git_directory> [SERVER_DOMAIN] [AIRFLOW__SECRETS__BACKEND] [AIRFLOW__SECRETS__BACKEND_KWARGS] [AIRFLOW__CORE__FERNET_KEY] [DAG_GIT_URL]
+# deployment.sh <user_home_directory> <git_directory> [SERVER_DOMAIN] [AIRFLOW__SECRETS__BACKEND] [AIRFLOW__SECRETS__BACKEND_KWARGS] [AIRFLOW__CORE__FERNET_KEY] [DAG_GIT_URL] [SSO_CLIENT_SECRET]
 
 OLD_DIR=`pwd`
 GIT_REPO=$HOME/data-logistics-service
@@ -15,7 +15,8 @@ if [ -z ${3+x} ]; then export SERVER_DOMAIN=dls.fz-juelich.de; else export SERVE
 if [ -z ${4+x} ]; then unset AIRFLOW__SECRETS__BACKEND; else export AIRFLOW__SECRETS__BACKEND=$4; fi
 if [ -z ${5+x} ]; then unset AIRFLOW__SECRETS__BACKEND_KWARGS; else export AIRFLOW__SECRETS__BACKEND_KWARGS=$5; fi
 if [ -z ${6+x} ]; then unset AIRFLOW__CORE__FERNET_KEY; else export AIRFLOW__CORE__FERNET_KEY=$6; fi
-if [ -z ${6+x} ]; then unset DAG_GIT_URL; else export DAG_GIT_URL=$7; fi
+if [ -z ${7+x} ]; then unset DAG_GIT_URL; else export DAG_GIT_URL=$7; fi
+if [ -z ${8+x} ]; then unset SSO_CLIENT_SECRET; else export SSO_CLIENT_SECRET=$8; fi
 
 
 
@@ -44,6 +45,8 @@ rm -rf $AIRFLOW_DIR/dags && mkdir $AIRFLOW_DIR/dags && git clone $DAG_GIT_URL $A
 cp -r plugins/* $AIRFLOW_DIR/plugins
 cp config/* $AIRFLOW_DIR/config/
 cp -r templates/* $AIRFLOW_DIR/templates
+cp webserver_config.py $AIRFLOW_DIR/webserver_config.py
+cp client_secret.json $AIRFLOW_DIR/client_secret.json
 # Setup environment variables and install requirements
 echo -e "AIRFLOW_UID=$(id -u)" > $GIT_REPO/dockers/.env
 export AIRFLOW_UID=$(id -u)
@@ -51,6 +54,7 @@ export AIRFLOW_UID=$(id -u)
 pip install -r $GIT_REPO/requirements.txt
 
 sed -i "s_datalogistics.eflows4hpc.eu_${SERVER_DOMAIN}_g" $GIT_REPO/dockers/docker-compose.yaml
+sed -i "s_SSO_CLIENT_SECRET_${SSO_CLIENT_SECRET}_g" $AIRFLOW_DIR/client_secret.json
 
 # it is at this point assumed that ip and volume are correctly assigned, and that dns is working properly
 echo "-----------Bringing up the docker containers-----------"
