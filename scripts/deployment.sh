@@ -46,7 +46,7 @@ cp -r plugins/* $AIRFLOW_DIR/plugins
 cp config/* $AIRFLOW_DIR/config/
 cp -r templates/* $AIRFLOW_DIR/templates
 cp webserver_config.py $AIRFLOW_DIR/webserver_config.py
-cp client_secret.json $AIRFLOW_DIR/client_secret.json
+cp client_secrets.json $AIRFLOW_DIR/client_secrets.json
 # Setup environment variables and install requirements
 echo -e "AIRFLOW_UID=$(id -u)" > $GIT_REPO/dockers/.env
 export AIRFLOW_UID=$(id -u)
