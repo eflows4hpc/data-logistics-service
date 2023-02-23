@@ -9,3 +9,6 @@ USER airflow
 RUN pip --version && python -m pip install --upgrade pip
 ADD requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
+
+# Copy the OIDC webserver_config.py into the container's $AIRFLOW_HOME
+COPY webserver_config.py $AIRFLOW_HOME/webserver_config.py
