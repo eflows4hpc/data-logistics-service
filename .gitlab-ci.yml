@@ -95,9 +95,11 @@ full-deploy-testing:
     - while [ "`openstack server show $INSTANCE_ID -c addresses -f value`" = "{}" ]; do sleep 5; done # wait until an address is available to attach the floating ip
     - openstack server add floating ip $INSTANCE_ID $TESTING_IP
     - sleep 10 # ensure that next command reaches the new server, prevents host key problems
-    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "sudo mkdir -p /persistent_data"
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "sudo mkdir -p /persistent_data/docker_volumes"
     - until ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP ls /finished_cloudinit >/dev/null 2>&1; do sleep 30; done # wait until cloudinit script is complete
     - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "sudo service docker restart" # to use the configured docker data path
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "docker volume create --name=persistent_postgres-db-volume"
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "docker volume create --name=persistent_certs"
     - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP 'sed -i "s_eflows-airflow:latest_eflows-airflow:testing_g" /home/airflow/data-logistics-service/dockers/docker-compose.yaml'
     - ssh -oStrictHostKeyChecking=accept-new airflow@$PTESTING_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $TESTING_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS $AIRFLOW_FERNET_KEY $DAG_GIT_URL $SSO_CLIENT_SECRET"
     - echo "Done"
