@@ -18,7 +18,7 @@ if [ -z ${6+x} ]; then unset AIRFLOW__CORE__FERNET_KEY; else export AIRFLOW__COR
 if [ -z ${7+x} ]; then unset DAG_GIT_URL; else export DAG_GIT_URL=$7; fi
 if [ -z ${8+x} ]; then unset OAUTH_CLIENT_ID; else export OAUTH_CLIENT_ID=$8; fi
 if [ -z ${9+x} ]; then unset OAUTH_CLIENT_SECRET; else export OAUTH_CLIENT_SECRET=$9; fi
-if [ -z ${10+x} ]; then unset OAUTH_METADATA_URL; else export OAUTH_METADATA_URL=$10; fi
+if [ -z ${10+x} ]; then unset OAUTH_METADATA_URL; else export OAUTH_METADATA_URL=${10}; fi
 
 
 
@@ -27,6 +27,9 @@ echo "DEBUG using secrets backend: $AIRFLOW__SECRETS__BACKEND"
 echo "DEBUG backend args length: ${#AIRFLOW__SECRETS__BACKEND_KWARGS}"
 #echo "DEBUG fernet key: ${AIRFLOW__CORE__FERNET_KEY}"
 echo "DEBUG DAG git dir: $DAG_GIT_URL"
+echo "DEBUG Client id: $OAUTH_CLIENT_ID"
+if [ -z ${OAUTH_CLIENT_SECRET+x} ]; then echo "Client secret is unset"; else echo "Client secret is set"; fi
+echo "DEBUG Metadata URL: $OAUTH_METADATA_URL"
 
 
 cd $ENTRYPOINT
