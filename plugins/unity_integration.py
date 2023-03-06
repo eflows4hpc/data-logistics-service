@@ -6,7 +6,7 @@ from flask_appbuilder import BaseView as AppBuilderBaseView
 from airflow.plugins_manager import AirflowPlugin
 
 log = logging.getLogger(__name__)
-log.setLevel(os.getenv("AIRFLOW__LOGGING__FAB_LOGGING_LEVEL", "INFO"))
+log.setLevel("DEBUG")
 
 FAB_ADMIN_ROLE = "Admin"
 FAB_VIEWER_ROLE = "Viewer"
@@ -32,7 +32,7 @@ class UnityIntegrationView(AppBuilderBaseView):
     @unity.route('/login')
     def login():
         redirect_uri = url_for('.authorize', _external=True)
-        log.debug("Redirect uri is " + str(redirect_uri))
+        log.debug("Redirect uri is '" + str(redirect_uri) + "'")
         return oauth.unity.authorize_redirect(redirect_uri)
     
     @unity.route('/authorize')
