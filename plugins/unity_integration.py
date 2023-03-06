@@ -18,9 +18,7 @@ oauth.register(
     client_id=os.getenv("OAUTH_CLIENT_ID"),
     server_metadata_url=os.getenv("OAUTH_METADATA_URL"),
     client_secret=os.getenv("OAUTH_CLIENT_SECRET"),
-    client_kwargs={
-        'scope' : 'openid email profile eflows'
-    }
+    client_kwargs={'scope' : 'openid profile email eflows'}
 
 )
 
@@ -33,6 +31,7 @@ class UnityIntegrationView(AppBuilderBaseView):
     def login():
         redirect_uri = url_for('.authorize', _external=True)
         log.debug("Redirect uri is '" + str(redirect_uri) + "'")
+        log.debug("Metadata uri is '" + str(os.getenv("OAUTH_METADATA_URL")) + "'")
         return oauth.unity.authorize_redirect(redirect_uri)
     
     @unity.route('/authorize')
