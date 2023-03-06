@@ -27,15 +27,15 @@ oauth.register(
 )
 
 class UnityIntegrationLoginView(AppBuilderBaseView):
-    @expose("/unity_login")
-    #@app.route('/unity_login')
+    #@expose("/unity_login")
+    @app.route('/unity_login')
     def unity_login():
         redirect_uri = url_for('unity_authorize', _external=True)
         return oauth.unity.authorize_redirect(redirect_uri)
 class UnityIntegrationAuthView(AppBuilderBaseView):
-    @expose("/unity_authorize")
-    #@app.route('/unity_authorize')
-    async def authorize():
+    #@expose("/unity_authorize")
+    @app.route('/unity_authorize')
+    async def unity_authorize():
         token = await oauth.unity.authorize_access_token()
         user = await oauth.unity.userinfo(token=token)
         # get relevant data from token
