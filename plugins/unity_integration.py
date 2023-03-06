@@ -1,6 +1,6 @@
 import os, random, string
 from authlib.integrations.flask_client import OAuth
-from flask import url_for, redirect, current_app as app
+from flask import url_for, redirect, current_app as app, Blueprint
 from flask_login import login_user
 from flask_appbuilder import expose, BaseView as AppBuilderBaseView
 from airflow.plugins_manager import AirflowPlugin
@@ -26,16 +26,17 @@ oauth.register(
 
 )
 
-class UnityIntegrationLoginView(AppBuilderBaseView):
-    #@expose("/unity_login")
-    @app.route('/unity_login')
-    def unity_login():
-        redirect_uri = url_for('unity_authorize', _external=True)
+unity = Blueprint('unity', __name__, url_prefix="/unity")
+
+class UnityIntegrationView(AppBuilderBaseView):
+
+    @unity.route('/login')
+    def login():
+        redirect_uri = url_for('authorize', _external=True)
         return oauth.unity.authorize_redirect(redirect_uri)
-class UnityIntegrationAuthView(AppBuilderBaseView):
-    #@expose("/unity_authorize")
-    @app.route('/unity_authorize')
-    async def unity_authorize():
+    
+    @unity.route('/authorize')
+    async def authorize():
         token = await oauth.unity.authorize_access_token()
         user = await oauth.unity.userinfo(token=token)
         # get relevant data from token
@@ -65,21 +66,21 @@ class UnityIntegrationAuthView(AppBuilderBaseView):
         # login as that user
         login_user(fab_user, remember=False)
         return redirect('/')
+    
+    @unity.route('/logout')
+    def logout():
+        pass
 
-v_unity_login_view = UnityIntegrationLoginView()
-v_unity_login_package = {
-    "name": "Unity Login View",
+
+v_unity_view = UnityIntegrationView()
+v_unity_package = {
+    "name": "Unity SSO View",
     "category": "Unity Integration",
-    "view": v_unity_login_view,
+    "view": v_unity_view,
 }
 
-v_unity_auth_view = UnityIntegrationAuthView()
-v_unity_auth_package = {
-    "name": "Unity Auth View",
-    "category": "Unity Integration",
-    "view": v_unity_auth_view,
-}
 
 class UnityIntegrationPlugin(AirflowPlugin):
     name = "unity_integration"
-    appbuilder_views = [v_unity_auth_package, v_unity_login_package]
+    appbuilder_views = [v_unity_package]
+    flask_blueprints = [unity]
