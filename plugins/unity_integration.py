@@ -1,9 +1,8 @@
 import os, random, string
 from authlib.integrations.flask_client import OAuth
-from flask import url_for, redirect
+from flask import url_for, redirect, current_app as app
 from flask_login import login_user
 from flask_appbuilder import expose, BaseView as AppBuilderBaseView
-from airflow.utils.airflow_flask_app import get_airflow_app
 from airflow.plugins_manager import AirflowPlugin
 import logging
 import os
@@ -15,7 +14,6 @@ FAB_ADMIN_ROLE = "Admin"
 FAB_VIEWER_ROLE = "Viewer"
 FAB_PUBLIC_ROLE = "Public"  # The "Public" role is given no permissions
 
-app= get_airflow_app()
 oauth = OAuth(app)
 oauth.register(
     name='unity',
@@ -53,7 +51,7 @@ class UnityIntegrationAuthView(AppBuilderBaseView):
         # check airflow user backend
         # check if user already exists, if not create it (with long random password)
         sec_manager = app.appbuilder.sm
-        fab_user = sec_manager.find_user('username')
+        fab_user = sec_manager.find_user(username=persistent_identifier)
         if fab_user is None: # TODO check if None is the rioght thing to compare to
             characters = string.ascii_letters + string.digits + string.punctuation
             fab_user = sec_manager.add_user(
