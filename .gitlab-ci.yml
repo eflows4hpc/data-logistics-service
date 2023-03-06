@@ -22,6 +22,8 @@ variables:
   TESTING_NAME: airflow-testing
   TESTING_URL: https://zam10115.zam.kfa-juelich.de
   TESTING_DOMAIN: zam10115.zam.kfa-juelich.de
+  METADATA_URL: https://zam10045.zam.kfa-juelich.de:7000/oauth2/.well-known/openid-configuration
+  TESTING_OAUTH_ID: ff3f5a29-d210-4be2-a6d4-93c4fc755bfe
 
 
 # before script copied from gitlab docs
@@ -101,7 +103,7 @@ full-deploy-testing:
     - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "docker volume create --name=persistent_postgres-db-volume"
     - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "docker volume create --name=persistent_certs"
     - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP 'sed -i "s_eflows-airflow:latest_eflows-airflow:testing_g" /home/airflow/data-logistics-service/dockers/docker-compose.yaml'
-    - ssh -oStrictHostKeyChecking=accept-new airflow@$PTESTING_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $TESTING_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS $AIRFLOW_FERNET_KEY $DAG_GIT_URL $SSO_CLIENT_SECRET"
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$PTESTING_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $TESTING_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS $AIRFLOW_FERNET_KEY $DAG_GIT_URL $TESTING_OAUTH_ID $SSO_CLIENT_SECRET $METADATA_URL"
     - echo "Done"
   
 light-deploy-testing:
@@ -114,7 +116,7 @@ light-deploy-testing:
   script:
     - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "cd /home/airflow/data-logistics-service && git stash && git stash clear && git checkout main && git checkout -f $CI_COMMIT_TAG && git pull --all"
     - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP 'sed -i "s_eflows-airflow:latest_eflows-airflow:testing_g" /home/airflow/data-logistics-service/dockers/docker-compose.yaml'
-    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $TESTING_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS $AIRFLOW_FERNET_KEY $DAG_GIT_URL $SSO_CLIENT_SECRET"
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $TESTING_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS $AIRFLOW_FERNET_KEY $DAG_GIT_URL $TESTING_OAUTH_ID $SSO_CLIENT_SECRET $METADATA_URL"
 
 
 

@@ -34,6 +34,7 @@ class UnityIntegrationView(AppBuilderBaseView):
     @unity.route('/login')
     def login():
         redirect_uri = url_for('unity.authorize', _external=True)
+        log.debug("Redirect uri is " + str(redirect_uri))
         return oauth.unity.authorize_redirect(redirect_uri)
     
     @unity.route('/authorize')
