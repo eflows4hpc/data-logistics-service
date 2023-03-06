@@ -1,11 +1,9 @@
-import os, random, string
+import os, random, string, logging
 from authlib.integrations.flask_client import OAuth
 from flask import url_for, redirect, current_app as app, Blueprint
 from flask_login import login_user
-from flask_appbuilder import expose, BaseView as AppBuilderBaseView
+from flask_appbuilder import BaseView as AppBuilderBaseView
 from airflow.plugins_manager import AirflowPlugin
-import logging
-import os
 
 log = logging.getLogger(__name__)
 log.setLevel(os.getenv("AIRFLOW__LOGGING__FAB_LOGGING_LEVEL", "INFO"))
@@ -73,16 +71,6 @@ class UnityIntegrationView(AppBuilderBaseView):
     def logout():
         pass
 
-
-v_unity_view = UnityIntegrationView()
-v_unity_package = {
-    "name": "Unity SSO View",
-    "category": "Unity Integration",
-    "view": v_unity_view,
-}
-
-
 class UnityIntegrationPlugin(AirflowPlugin):
-    name = "unity_integration"
-    appbuilder_views = []
+    name = "Unity Integration"
     flask_blueprints = [unity]
