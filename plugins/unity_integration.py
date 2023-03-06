@@ -30,6 +30,7 @@ unity = Blueprint('unity', __name__, url_prefix="/unity")
 
 class UnityIntegrationView(AppBuilderBaseView):
 
+    @unity.route('/')
     @unity.route('/login')
     def login():
         redirect_uri = url_for('authorize', _external=True)
