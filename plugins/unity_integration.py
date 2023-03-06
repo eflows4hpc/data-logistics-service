@@ -33,7 +33,7 @@ class UnityIntegrationView(AppBuilderBaseView):
     @unity.route('/')
     @unity.route('/login')
     def login():
-        redirect_uri = url_for('authorize', _external=True)
+        redirect_uri = url_for('unity.authorize', _external=True)
         return oauth.unity.authorize_redirect(redirect_uri)
     
     @unity.route('/authorize')
@@ -83,5 +83,5 @@ v_unity_package = {
 
 class UnityIntegrationPlugin(AirflowPlugin):
     name = "unity_integration"
-    appbuilder_views = [v_unity_package]
+    appbuilder_views = []
     flask_blueprints = [unity]
