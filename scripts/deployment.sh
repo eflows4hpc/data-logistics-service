@@ -2,7 +2,7 @@
 # @author Maria Petrova & Christian Böttcher
 ## USAGE:
 #
-# deployment.sh <user_home_directory> <git_directory> [SERVER_DOMAIN] [AIRFLOW__SECRETS__BACKEND] [AIRFLOW__SECRETS__BACKEND_KWARGS] [AIRFLOW__CORE__FERNET_KEY] [DAG_GIT_URL] [SSO_CLIENT_SECRET]
+# deployment.sh <user_home_directory> <git_directory> [SERVER_DOMAIN] [AIRFLOW__SECRETS__BACKEND] [AIRFLOW__SECRETS__BACKEND_KWARGS] [AIRFLOW__CORE__FERNET_KEY] [DAG_GIT_URL] [SSO_CLIENT_ID] [SSO_CLIENT_SECRET] [SSO_METADATA_URL]
 
 OLD_DIR=`pwd`
 GIT_REPO=$HOME/data-logistics-service
@@ -16,7 +16,9 @@ if [ -z ${4+x} ]; then unset AIRFLOW__SECRETS__BACKEND; else export AIRFLOW__SEC
 if [ -z ${5+x} ]; then unset AIRFLOW__SECRETS__BACKEND_KWARGS; else export AIRFLOW__SECRETS__BACKEND_KWARGS=$5; fi
 if [ -z ${6+x} ]; then unset AIRFLOW__CORE__FERNET_KEY; else export AIRFLOW__CORE__FERNET_KEY=$6; fi
 if [ -z ${7+x} ]; then unset DAG_GIT_URL; else export DAG_GIT_URL=$7; fi
-if [ -z ${8+x} ]; then unset SSO_CLIENT_SECRET; else export SSO_CLIENT_SECRET=$8; fi
+if [ -z ${8+x} ]; then unset OAUTH_CLIENT_ID; else export OAUTH_CLIENT_ID=$8; fi
+if [ -z ${9+x} ]; then unset OAUTH_CLIENT_SECRET; else export OAUTH_CLIENT_SECRET=$9; fi
+if [ -z ${10+x} ]; then unset OAUTH_METADATA_URL; else export OAUTH_METADATA_URL=$10; fi
 
 
 
