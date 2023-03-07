@@ -42,6 +42,7 @@ class UnityIntegrationView(AppBuilderBaseView):
             abort(403)
         user = oauth.unity.userinfo(token=token)
         # get relevant data from token
+        log.debug(str(user))
         email = user['email']
         persistent_identifier = user["sub"]
         first_name = user["given_name"]
