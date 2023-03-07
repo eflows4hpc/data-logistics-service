@@ -65,7 +65,9 @@ class UnityIntegrationView(AppBuilderBaseView):
         # check if user already exists, if not create it (with long random password)
         sec_manager = app.appbuilder.sm
         fab_user = sec_manager.find_user(username=persistent_identifier)
+        log.debug("Searching for user gave '" + (str(fab_user)) + "'")
         if fab_user is None: # TODO check if None is the rioght thing to compare to
+            log.debug("Trying to create non-existing user")
             characters = string.ascii_letters + string.digits + string.punctuation
             fab_user = sec_manager.add_user(
                 username=persistent_identifier,
