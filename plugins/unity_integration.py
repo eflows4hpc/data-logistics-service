@@ -45,8 +45,8 @@ class UnityIntegrationView(AppBuilderBaseView):
         log.debug(str(user))
         email = user['email']
         persistent_identifier = user["sub"]
-        first_name = user["given_name"]
-        last_name = user["family_name"]
+        first_name = user["firstname"]
+        last_name = user["surname"]
         admin_access = user.get('eflows:dlsAccess', False)
 
         log.debug("SSO user logging in...")
