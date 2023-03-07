@@ -44,6 +44,15 @@ class UnityIntegrationView(AppBuilderBaseView):
         first_name = user["given_name"]
         last_name = user["family_name"]
         admin_access = user.get('eflows:dlsAccess', False)
+
+        log.debug("SSO user logging in...")
+        log.debug("sub : " + persistent_identifier)
+        log.debug("first name : " + first_name)
+        log.debug("last name : " + last_name)
+        log.debug("email : " + email)
+        log.debug("admin : " + admin_access)
+        log.debug("......................")
+
         role = FAB_VIEWER_ROLE
         if admin_access:
             role = FAB_ADMIN_ROLE
@@ -64,7 +73,7 @@ class UnityIntegrationView(AppBuilderBaseView):
             )
         # login as that user
         login_user(fab_user, remember=False)
-        return redirect('/')
+        return redirect(url_for('home'))
     
     @unity.route('/logout')
     def logout():
