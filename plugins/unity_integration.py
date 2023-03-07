@@ -1,6 +1,6 @@
 import os, random, string, logging
 from authlib.integrations.flask_client import OAuth
-from flask import url_for, redirect, current_app as app, Blueprint
+from flask import url_for, redirect, current_app as app, Blueprint, abort
 from flask_login import login_user
 from flask_appbuilder import BaseView as AppBuilderBaseView
 from airflow.plugins_manager import AirflowPlugin
@@ -35,9 +35,12 @@ class UnityIntegrationView(AppBuilderBaseView):
         return oauth.unity.authorize_redirect(redirect_uri)
     
     @unity.route('/authorize')
-    async def authorize():
-        token = await oauth.unity.authorize_access_token()
-        user = await oauth.unity.userinfo(token=token)
+    def authorize():
+        try:
+            token = oauth.unity.authorize_access_token()
+        except:
+            abort(403)
+        user = oauth.unity.userinfo(token=token)
         # get relevant data from token
         email = user['email']
         persistent_identifier = user["sub"]
