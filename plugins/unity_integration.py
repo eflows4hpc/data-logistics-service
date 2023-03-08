@@ -64,7 +64,6 @@ class UnityIntegrationView(AppBuilderBaseView):
         # check airflow user backend
         # check if user already exists, if not create it (with long random password)
         sec_manager = app.appbuilder.sm
-        log.debug("Security manager type is " + str(type(sec_manager)))
         fab_user = sec_manager.find_user(username=persistent_identifier)
         log.debug("Searching for user by name gave '" + (str(fab_user)) + "'")
 
@@ -76,7 +75,7 @@ class UnityIntegrationView(AppBuilderBaseView):
                 first_name=first_name,
                 last_name=last_name,
                 email=email,
-                role=role,
+                role=sec_manager.find_role(role),
                 password=''.join(random.choice(characters) for i in range(20))
             )
         # login as that user
