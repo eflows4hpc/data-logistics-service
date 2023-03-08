@@ -67,17 +67,26 @@ class UnityIntegrationView(AppBuilderBaseView):
         fab_user = sec_manager.find_user(username=persistent_identifier)
         log.debug("Searching for user by name gave '" + (str(fab_user)) + "'")
 
-        if fab_user is None: # TODO check if None is the rioght thing to compare to
+        if fab_user is None:
+            fab_user = sec_manager.find_user(email=email)
+            log.debug("Searching for user by email gave '" + (str(fab_user)) + "'")
+
+        if fab_user is None:
             log.debug("Trying to create non-existing user")
             characters = string.ascii_letters + string.digits + string.punctuation
-            fab_user = sec_manager.add_user(
+            if sec_manager.add_user(
                 username=persistent_identifier,
                 first_name=first_name,
                 last_name=last_name,
                 email=email,
                 role=sec_manager.find_role(role),
                 password=''.join(random.choice(characters) for i in range(20))
-            )
+            ):
+                fab_user = sec_manager.find_user(name=persistent_identifier)
+                log.info("Successfully created user " + str(fab_user))
+            else:
+                log.error("User creation unsuccessful.")
+                abort(500)
         # login as that user
         login_user(fab_user, remember=False)
         return redirect(url_for('home'))
