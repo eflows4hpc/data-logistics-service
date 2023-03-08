@@ -89,7 +89,7 @@ class UnityIntegrationView(AppBuilderBaseView):
                 abort(500)
         # login as that user
         login_user(fab_user, remember=False)
-        return redirect(url_for('home'))
+        return redirect(url_for('app.home'))
     
     @unity.route('/logout')
     def logout():
