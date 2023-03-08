@@ -82,7 +82,7 @@ class UnityIntegrationView(AppBuilderBaseView):
                 role=sec_manager.find_role(role),
                 password=''.join(random.choice(characters) for i in range(20))
             ):
-                fab_user = sec_manager.find_user(name=persistent_identifier)
+                fab_user = sec_manager.find_user(username=persistent_identifier)
                 log.info("Successfully created user " + str(fab_user))
             else:
                 log.error("User creation unsuccessful.")
