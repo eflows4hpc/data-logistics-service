@@ -47,7 +47,7 @@ class UnityIntegrationView(AppBuilderBaseView):
         persistent_identifier = user["sub"]
         first_name = user["firstname"]
         last_name = user["surname"]
-        admin_access = user.get('eflows:dlsAccess', 'False')
+        admin_access = user.get('eflows:dlsAccess', 'false')
 
         log.debug("SSO user logging in...")
         log.debug("sub : " + persistent_identifier)
@@ -58,7 +58,7 @@ class UnityIntegrationView(AppBuilderBaseView):
         log.debug("......................")
 
         role = FAB_VIEWER_ROLE
-        if admin_access:
+        if admin_access == 'true':
             role = FAB_ADMIN_ROLE
 
         # check airflow user backend
