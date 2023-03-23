@@ -159,7 +159,7 @@ light-deploy-production:
   <<: *ssh_setup
   environment: Production
   script:
-    - ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "cd /home/airflow/data-logistics-service && git stash && git stash clear && git checkout main && git checkout -f $CI_COMMIT_TAG && git pull --all && rm -rf dags && git clone https://github.com/eflows4hpc/dls-dags.git dags"
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "cd /home/airflow/data-logistics-service && git stash && git stash clear && git checkout main && git checkout -f $CI_COMMIT_TAG && rm -rf dags && git clone https://github.com/eflows4hpc/dls-dags.git dags"
     - ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $PRODUCTION_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS $AIRFLOW_FERNET_KEY $DAG_GIT_URL $SSO_CLIENT_SECRET"
 
 test-production-webserver:
