@@ -1,32 +1,146 @@
- 
 {#
- Licensed to the Apache Software Foundation (ASF) under one
- or more contributor license agreements.  See the NOTICE file
- distributed with this work for additional information
- regarding copyright ownership.  The ASF licenses this file
- to you under the Apache License, Version 2.0 (the
- "License"); you may not use this file except in compliance
- with the License.  You may obtain a copy of the License at
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+ 
+    http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+ #}
+ 
+ {% extends 'appbuilder/baselayout.html' %}
+ {% from 'airflow/_messages.html' import show_message %}
+ 
+ {% block page_title -%}
+   {% if title is defined -%}
+     {{ title }} - {{ appbuilder.app_name }}
+   {% else -%}
+     {{ appbuilder.app_name }}
+   {% endif%}
+ {% endblock %}
+ 
+ {% block head_meta %}
+   {{ super() }}
+   {% if scheduler_job is defined and (scheduler_job and scheduler_job.is_alive()) %}
+     <meta name="is_scheduler_running" content="True">
+   {% endif %}
+ {% endblock %}
+ 
+ {% block head_css %}
+   {{ super() }}
+ 
+   {% if not appbuilder.app_theme %}
+     {# airflowDefaultTheme.css file contains the styles from local bootstrap-theme.css #}
+     <link rel="stylesheet" type="text/css" href="{{ url_for_asset('airflowDefaultTheme.css') }}">
+   {% endif %}
+   <link rel="stylesheet" type="text/css" href="{{ url_for_asset('materialIcons.css') }}">
+   <link rel="stylesheet" type="text/css" href="{{ url_for_asset('main.css') }}">
+   <link rel="stylesheet" type="text/css" href="{{ url_for_asset('loadingDots.css') }}">
+   <link rel="stylesheet" type="text/css" href="{{ url_for_asset('bootstrap-datetimepicker.min.css') }}">
+   <style type="text/css">
+     {% for state, state_color in state_color_mapping.items() %}
+       span.{{state}} {
+         background-color: {{state_color}};
+       }
+     {% endfor %}
+   </style>
+   <link rel="icon" type="image/png" href="{{ url_for('static', filename='pin_32.png') }}">
+ {% endblock %}
+ 
+ {% block messages %}
+   {% include 'appbuilder/flash.html' %}
+   {% if scheduler_job is defined and (not scheduler_job or not scheduler_job.is_alive()) %}
+     {% call show_message(category='warning', dismissible=false) %}
+       <p>The scheduler does not appear to be running.
+       {% if scheduler_job %}
+       Last heartbeat was received
+       <time class="scheduler-last-heartbeat"
+         title="{{ scheduler_job.latest_heartbeat.isoformat() }}"
+         datetime="{{ scheduler_job.latest_heartbeat.isoformat() }}"
+         data-datetime-convert="false"
+       >{{ macros.datetime_diff_for_humans(scheduler_job.latest_heartbeat) }}</time>.
+       {% endif %}
+       </p>
+       <p>The DAGs list may not update, and new tasks will not be scheduled.</p>
+     {% endcall %}
+   {% endif %}
+   {% if triggerer_job is defined and (not triggerer_job or not triggerer_job.is_alive()) %}
+     {% call show_message(category='warning', dismissible=false) %}
+       <p>The triggerer does not appear to be running.
+       {% if triggerer_job %}
+       Last heartbeat was received
+       <time class="scheduler-last-heartbeat"
+         title="{{ triggerer_job.latest_heartbeat.isoformat() }}"
+         datetime="{{ triggerer_job.latest_heartbeat.isoformat() }}"
+         data-datetime-convert="false"
+       >{{ macros.datetime_diff_for_humans(triggerer_job.latest_heartbeat) }}</time>.
+       {% endif %}
+       </p>
+       <p>Triggers will not run, and any deferred operator will remain deferred until it times out and fails.</p>
+     {% endcall %}
+   {% endif %}
+ {% endblock %}
 
-   http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing,
- software distributed under the License is distributed on an
- "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- KIND, either express or implied.  See the License for the
- specific language governing permissions and limitations
- under the License.
-#}
-
-{% extends 'appbuilder/baselayout.html' %}
-{% from 'airflow/_messages.html' import show_message %}
-
-{% block page_title -%}
-  {% if title is defined -%}
-    {{ title }} - {{ appbuilder.app_name }}
-  {% else -%}
-    {{ appbuilder.app_name }}
-  {% endif%}
+ {% block footer %}
+ {% if not current_user.is_anonymous %}
+   {% set version_label = 'Version' %}
+   <!-- Use a wrapper div to detach the footer from the content -> just nice to have -->
+   <div style="padding-bottom: 1rem !important; visibility: hidden !important; flex-grow: 1 !important; -ms-flex-direction: column !important; display: flex !important;
+     flex-direction: column !important;">
+     .
+   </div>
+   <footer class="footer" style="background-image: url(https://eflows4hpc.eu/wp-content/uploads/2021/02/Barra-gris-footer.png) !important; height: auto; color: #575756 !important; background-repeat: no-repeat !important; background-size: cover !important; margin-top: auto !important;">
+       <div class="container p-0" style="padding: 0px !important">
+         <div class="p-0 w-100" style="background-image: url(https://eflows4hpc.eu/wp-content/uploads/2021/01/barra-3-color-8.png) !important; width: 100%; height: 15px; background-repeat: no-repeat !important; background-size: cover !important; padding: 0px; !important"></div>
+         <div class="row mt-2 px-3" style="margin-top: 0.5rem; padding-right: 1rem;">
+           <div class="col-lg-5 col-12 d-inlign-flex">
+             <p class="m-3 text-center align-self-center" style="-ms-flex-item-align: center !important; align-self: center !important; margin: 1rem !important">
+               <a href="https://www.eFlows4HPC.eu">
+                 <img src="https://eflows4hpc.eu/wp-content/uploads/2021/02/logo-blanc_1-1.svg" alt="eFlows4HPC Logo" title="eFlows4HPC" style="height: auto; max-height: 70px;" class="m-4 align-self-center"/>
+               </a>
+               <a href="https://twitter.com/eFlows4HPC"><i class="fa fa-twitter-square m-4 fa-2x" style="color: white"></i></a>
+               <a href="https://www.linkedin.com/company/eflows4hpc/"><i class="fa fa-linkedin-square  mr-4 fa-2x" style="color: white"></i></a>
+               <a href="https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service/"><i class="fa fa-github-square mr-4 fa-2x" style="color: white"></i></a>
+             </p>
+           </div>
+           <div class="col-lg-2 col-6 d-inlign-flex">
+             <p class="text-center align-self-center">
+               <img loading="lazy" src="./../../static/BMBF_gefoerdert_2017_en.jpg" alt="Funded by BMBF" style="max-height:100px">
+             </p>
+           </div>
+           <div class="col-lg-5 col-12 d-inlign-flex">
+             <p class="m-2 align-self-center" style="color: white; -ms-flex-item-align: center !important; align-self: center !important; margin: 0.5rem;">
+               <span class="mr-3 mt-1 float-left" style="float: left !important; margin-right: 1rem; margin-top: 0.25rem ">
+                 <img loading="lazy" src="https://eflows4hpc.eu/wp-content/uploads/2021/01/bandera-8.png" alt="" style="max-width:52px; max-height:34px;">
+               </span>
+               <small style="display: flow-root">
+                 This work has been supported by the eFlows4HPC project, contract #955558. This project has received funding from the European High-Performance Computing Joint Undertaking (JU) under grant agreement No 955558.
+                 <br>
+                 The JU receives support from the European Union’s Horizon 2020 research and innovation programme and Spain, Germany, France, Italy, Poland, Switzerland, Norway. 
+                 <strong>
+                 <a style="color: #f39200" href="https://www.fz-juelich.de/portal/EN/Service/LegalNotice/_node.html">Impressum</a>
+                 </strong>
+                 <br>
+                 The project has recieved funding from German Federal Ministry of Education and Research agreement no. 16GPC016K.
+               </small>
+               <div class="row mt-4 pl-5" style="margin-top: 1.5rem; padding-left: 3rem !important; ">
+                 <p style="border-top: 1px solid darkgray;"><small>This service is based on Apache Airflow {{ version_label }}: {% if airflow_version %}<a href="https://pypi.python.org/pypi/apache-airflow/{{ airflow_version }}" target="_blank">v{{ airflow_version }}</a>{% else %} N/A{% endif %}</small></p>
+               </div>
+             </p>
+           </div>
+         </div>
+       </div>
+   </footer>
+ {% endif %}
 {% endblock %}
 
 {% block head_css %}
@@ -50,107 +164,9 @@
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='pin_32.png') }}">
 {% endblock %}
 
-{% block messages %}
-  {% include 'appbuilder/flash.html' %}
-  {% if scheduler_job is defined and (not scheduler_job or not scheduler_job.is_alive()) %}
-    {% call show_message(category='warning', dismissible=false) %}
-      <p>The scheduler does not appear to be running.
-      {% if scheduler_job %}
-      Last heartbeat was received
-      <time class="scheduler-last-heartbeat"
-        title="{{ scheduler_job.latest_heartbeat.isoformat() }}"
-        datetime="{{ scheduler_job.latest_heartbeat.isoformat() }}"
-        data-datetime-convert="false"
-      >{{ macros.datetime_diff_for_humans(scheduler_job.latest_heartbeat) }}</time>.
-      {% endif %}
-      </p>
-      <p>The DAGs list may not update, and new tasks will not be scheduled.</p>
-    {% endcall %}
-  {% endif %}
-  {% if triggerer_job is defined and (not triggerer_job or not triggerer_job.is_alive()) %}
-    {% call show_message(category='warning', dismissible=false) %}
-      <p>The triggerer does not appear to be running.
-      {% if triggerer_job %}
-      Last heartbeat was received
-      <time class="scheduler-last-heartbeat"
-        title="{{ triggerer_job.latest_heartbeat.isoformat() }}"
-        datetime="{{ triggerer_job.latest_heartbeat.isoformat() }}"
-        data-datetime-convert="false"
-      >{{ macros.datetime_diff_for_humans(triggerer_job.latest_heartbeat) }}</time>.
-      {% endif %}
-      </p>
-      <p>Triggers will not run, and any deferred operator will remain deferred until it times out and fails.</p>
-    {% endcall %}
-  {% endif %}
-{% endblock %}
-
-{% block footer %}
-  {% if not current_user.is_anonymous %}
-    {% set version_label = 'Version' %}
-    <!-- Use a wrapper div to detach the footer from the content -> just nice to have -->
-    <div style="padding-bottom: 1rem !important; visibility: hidden !important; flex-grow: 1 !important; -ms-flex-direction: column !important; display: flex !important;
-      flex-direction: column !important;">
-      .
-    </div>
-    <footer class="footer" style="background-image: url(https://eflows4hpc.eu/wp-content/uploads/2021/02/Barra-gris-footer.png) !important; height: auto; color: #575756 !important; background-repeat: no-repeat !important; background-size: cover !important; margin-top: auto !important;">
-        <div class="container p-0" style="padding: 0px !important">
-          <div class="p-0 w-100" style="background-image: url(https://eflows4hpc.eu/wp-content/uploads/2021/01/barra-3-color-8.png) !important; width: 100%; height: 15px; background-repeat: no-repeat !important; background-size: cover !important; padding: 0px; !important"></div>
-          <div class="row mt-2 px-3" style="margin-top: 0.5rem; padding-right: 1rem;">
-            <div class="col-lg-5 col-12 d-inlign-flex">
-              <p class="m-3 text-center align-self-center" style="-ms-flex-item-align: center !important; align-self: center !important; margin: 1rem !important">
-                <a href="https://www.eFlows4HPC.eu">
-                  <img src="https://eflows4hpc.eu/wp-content/uploads/2021/02/logo-blanc_1-1.svg" alt="eFlows4HPC Logo" title="eFlows4HPC" style="height: auto; max-height: 70px;" class="m-4 align-self-center"/>
-                </a>
-                <a href="https://twitter.com/eFlows4HPC"><i class="fa fa-twitter-square m-4 fa-2x" style="color: white"></i></a>
-                <a href="https://www.linkedin.com/company/eflows4hpc/"><i class="fa fa-linkedin-square  mr-4 fa-2x" style="color: white"></i></a>
-                <a href="https://gitlab.jsc.fz-juelich.de/eflows4hpc-wp2/data-logistics-service/"><i class="fa fa-github-square mr-4 fa-2x" style="color: white"></i></a>
-              </p>
-            </div>
-            <div class="col-lg-2 col-6 d-inlign-flex">
-              <p class="text-center align-self-center">
-	      <img loading="lazy" src="{{ url_for('static', filename='BMBF_gefoerdert_2017_en.jpg') }}" alt="Funded by BMBF" style="max-height:100px">
-              </p>
-            </div>
-            <div class="col-lg-5 col-12 d-inlign-flex">
-              <p class="m-2 align-self-center" style="color: white; -ms-flex-item-align: center !important; align-self: center !important; margin: 0.5rem;">
-                <span class="mr-3 mt-1 float-left" style="float: left !important; margin-right: 1rem; margin-top: 0.25rem ">
-                  <img loading="lazy" src="https://eflows4hpc.eu/wp-content/uploads/2021/01/bandera-8.png" alt="" style="max-width:52px; max-height:34px;">
-                </span>
-                <small style="display: flow-root">
-                  This work has been supported by the eFlows4HPC project, contract #955558. This project has received funding from the European High-Performance Computing Joint Undertaking (JU) under grant agreement No 955558.
-                  <br>
-                  The JU receives support from the European Union’s Horizon 2020 research and innovation programme and Spain, Germany, France, Italy, Poland, Switzerland, Norway. 
-                  <strong>
-                  <a style="color: #f39200" href="https://www.fz-juelich.de/portal/EN/Service/LegalNotice/_node.html">Impressum</a>
-                  </strong>
-                  <br>
-                  The project has recieved funding from German Federal Ministry of Education and Research agreement no. 16GPC016K.
-                </small>
-                <div class="row mt-4 pl-5" style="margin-top: 1.5rem; padding-left: 3rem !important; ">
-                  <p style="border-top: 1px solid darkgray;"><small>This service is based on Apache Airflow {{ version_label }}: {% if airflow_version %}<a href="https://pypi.python.org/pypi/apache-airflow/{{ airflow_version }}" target="_blank">v{{ airflow_version }}</a>{% else %} N/A{% endif %}</small></p>
-                </div>
-              </p>
-            </div>
-          </div>
-        </div>
-    </footer>
-  {% endif %}
-{% endblock %}
-
 {% block tail_js %}
   {{ super() }}
 
-  <script>
-    // below variables are used in main.js
-    // keep as var, changing to const or let breaks other code
-    var Airflow = {
-      serverTimezone: '{{ server_timezone }}',
-      defaultUITimezone: '{{ default_ui_timezone }}',
-    };
-    var hostName = '{{ hostname }}';
-    var csrfToken = '{{ csrf_token() }}';
-    $('time[title]').tooltip();
-  </script>
   <!-- CUSTOM FOOTER SCRIPT -->
   <!-- Calculate the size of the dynamic footer to make sure that it doesn't cover the content of the page. Helps also on mobile devices. -->
   <script>
@@ -170,15 +186,25 @@
       footerAlign();
     });
   </script>
-  <!--[if IE ]>
-  <script src="{{ url_for_asset('ie.js') }}"></script>
-  <![endif]-->
-  <script src="{{ url_for_asset('moment.js') }}"></script>
-  <script src="{{ url_for_asset('main.js') }}"></script>
-  <script src="{{ url_for_asset('bootstrap-datetimepicker.min.js') }}"></script>
-  <script src="{{ url_for_asset('bootstrap3-typeahead.min.js') }}"></script>
-
-  {% if analytics_tool is defined and analytics_tool %}
-    {% include "analytics/" + analytics_tool + ".html" %}
-  {% endif %}
-{% endblock %}
+ 
+   <script>
+     // below variables are used in main.js
+     // keep as var, changing to const or let breaks other code
+     var Airflow = {
+       serverTimezone: '{{ server_timezone }}',
+       defaultUITimezone: '{{ default_ui_timezone }}',
+     };
+     var hostName = '{{ hostname }}';
+     var csrfToken = '{{ csrf_token() }}';
+     $('time[title]').tooltip();
+   </script>
+   <script src="{{ url_for_asset('moment.js') }}"></script>
+   <script src="{{ url_for_asset('main.js') }}"></script>
+   <script src="{{ url_for_asset('bootstrap-datetimepicker.min.js') }}"></script>
+   <script src="{{ url_for_asset('bootstrap3-typeahead.min.js') }}"></script>
+ 
+   {% if analytics_tool is defined and analytics_tool %}
+     {% include "analytics/" + analytics_tool + ".html" %}
+   {% endif %}
+ {% endblock %}
+ 
