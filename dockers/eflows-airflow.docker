@@ -1,12 +1,13 @@
-FROM apache/airflow:2.2.5
-
+FROM apache/airflow:slim-2.5.1-python3.8
 USER root
 RUN apt update && apt install git -y && apt clean && rm -rf /var/lib/apt/lists/*
-COPY ./templates/main.html /home/airflow/.local/lib/python3.7/site-packages/airflow/www/templates/airflow/main.html
-COPY ./templates/navbar_right.html /home/airflow/.local/lib/python3.7/site-packages/airflow/www/templates/appbuilder/navbar_right.html
-COPY ./templates/img/BMBF_gefoerdert_2017_en.jpg /home/airflow/.local/lib/python3.7/site-packages/airflow/www/static/BMBF_gefoerdert_2017_en.jpg
+COPY ./templates/main.html /home/airflow/.local/lib/python3.8/site-packages/airflow/www/templates/airflow/main.html
+COPY ./templates/navbar_right.html /home/airflow/.local/lib/python3.8/site-packages/airflow/www/templates/appbuilder/navbar_right.html
+COPY ./templates/img/BMBF_gefoerdert_2017_en.jpg /home/airflow/.local/lib/python3.8/site-packages/airflow/www/static/BMBF_gefoerdert_2017_en.jpg
 USER airflow
 
+USER airflow
+ENV SQLALCHEMY_SILENCE_UBER_WARNING=1
 RUN pip --version && python -m pip install --upgrade pip
 ADD requirements.txt /requirements.txt
-RUN pip install -r /requirements.txt
+RUN pip install --no-cache-dir -r /requirements.txt

@@ -2,9 +2,15 @@ requests
 urllib3
 plyvel
 webdavclient3
+boto3==1.24.32
+apache-airflow[celery]==2.5.1
+apache-airflow[redis]==2.5.1
 apache-airflow-providers-ssh
 apache-airflow-providers-http
 apache-airflow-providers-sftp
+apache-airflow-providers-hashicorp
+apache-airflow-providers-postgres
+apache-airflow-providers-celery
 --index-url https://gitlab.jsc.fz-juelich.de/api/v4/projects/4405/packages/pypi/simple
 airflow-datacat-integration>=0.1.4
 flask-oidc 
