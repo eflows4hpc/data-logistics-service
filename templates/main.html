@@ -34,27 +34,7 @@
      <meta name="is_scheduler_running" content="True">
    {% endif %}
  {% endblock %}
- 
- {% block head_css %}
-   {{ super() }}
- 
-   {% if not appbuilder.app_theme %}
-     {# airflowDefaultTheme.css file contains the styles from local bootstrap-theme.css #}
-     <link rel="stylesheet" type="text/css" href="{{ url_for_asset('airflowDefaultTheme.css') }}">
-   {% endif %}
-   <link rel="stylesheet" type="text/css" href="{{ url_for_asset('materialIcons.css') }}">
-   <link rel="stylesheet" type="text/css" href="{{ url_for_asset('main.css') }}">
-   <link rel="stylesheet" type="text/css" href="{{ url_for_asset('loadingDots.css') }}">
-   <link rel="stylesheet" type="text/css" href="{{ url_for_asset('bootstrap-datetimepicker.min.css') }}">
-   <style type="text/css">
-     {% for state, state_color in state_color_mapping.items() %}
-       span.{{state}} {
-         background-color: {{state_color}};
-       }
-     {% endfor %}
-   </style>
-   <link rel="icon" type="image/png" href="{{ url_for('static', filename='pin_32.png') }}">
- {% endblock %}
+
  
  {% block messages %}
    {% include 'appbuilder/flash.html' %}
