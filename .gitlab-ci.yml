@@ -118,6 +118,16 @@ light-deploy-testing:
     - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP 'sed -i "s_eflows-airflow:latest_eflows-airflow:testing_g" /home/airflow/data-logistics-service/dockers/docker-compose.yaml'
     - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $TESTING_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS $AIRFLOW_FERNET_KEY $DAG_GIT_URL $TESTING_OAUTH_ID $SSO_CLIENT_SECRET $METADATA_URL"
 
+force-light-deploy-testing: # for deploying images generated on other branches to testing - can only be done by logged in and authorized users
+  stage: deploy
+  when: manual
+
+  <<: *ssh_setup
+  environment: Testing
+  script:
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "cd /home/airflow/data-logistics-service && git stash && git stash clear && git checkout main && git checkout -f $CI_COMMIT_TAG && git pull --all"
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP 'sed -i "s_eflows-airflow:latest_eflows-airflow:testing_g" /home/airflow/data-logistics-service/dockers/docker-compose.yaml'
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$TESTING_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $TESTING_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS $AIRFLOW_FERNET_KEY $DAG_GIT_URL $TESTING_OAUTH_ID $SSO_CLIENT_SECRET $METADATA_URL"
 
 
 full-deploy-production:
