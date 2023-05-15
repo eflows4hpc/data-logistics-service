@@ -46,7 +46,7 @@ echo "Proceeding as user $(whoami)"
 # Make the necessary folders for the airflow artefacts and copy the corresponging content
 mkdir -p ./dags ./logs ./plugins ./config ./templates
 cd $GIT_REPO
-rm -rf $AIRFLOW_DIR/dags/{*,.[!.]*]} && git clone $DAG_GIT_URL $AIRFLOW_DIR/dags # rm contents of directory, but not directory itself, since this may cause issues with dag scheduler
+rm -rf $AIRFLOW_DIR/dags/{*,.[!.]*} && git clone $DAG_GIT_URL $AIRFLOW_DIR/dags # rm contents of directory, but not directory itself, since this may cause issues with dag scheduler
 cp -r plugins/* $AIRFLOW_DIR/plugins
 cp config/* $AIRFLOW_DIR/config/
 cp -r templates/* $AIRFLOW_DIR/templates
