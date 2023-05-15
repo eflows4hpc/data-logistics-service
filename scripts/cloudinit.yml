@@ -63,6 +63,7 @@ write_files:
   - path: /home/airflow/.ssh/airflow-docker-worker-RSA.pub
     permission: 0644
     owner: airflow
+    defer: true
     content: |
       ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZ3K2X9hEUy/RjS8Fzjg5hANKyuGus8kPufahuHf8s2KdmGrGMiJ6rEA5ZXH+xBp8FBKfAE6wWeRa0EKi7syVxn/zubr2raXXnf2Zq3jSvu3uFhVmauoBG+f/+l0EmJcVS2V4VbYQ9F6Rh0O/nzlIITzPr3/08gE5jAGz/5ckMtbDUru9laDITwxzH1cvepsMQ2gwcW3bP596M+N0zGlagR0/JHveZvFL46LAC3d2a/z9afraNyZvuycM4D7T0CWdEoWle0aXrVbYbY70Ik19+EAztvdjjK5u+CXpHWGi80qy8jCjIfkgfWnIzTVs/Op3eeI8eDWRw/SnkC4HgGyS9 Generated-by-Nova
 
