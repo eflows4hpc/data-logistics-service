@@ -24,7 +24,7 @@ variables:
   TESTING_DOMAIN: zam10115.zam.kfa-juelich.de
   METADATA_URL: https://zam10045.zam.kfa-juelich.de:7000/oauth2/.well-known/openid-configuration
   TESTING_OAUTH_ID: ff3f5a29-d210-4be2-a6d4-93c4fc755bfe
-  PRODCUTION_OAUTH_ID: affcd446-cab1-4751-8d76-e792f830d415
+  PRODUCTION_OAUTH_ID: affcd446-cab1-4751-8d76-e792f830d415
 
 
 # before script copied from gitlab docs
