@@ -24,6 +24,7 @@ variables:
   TESTING_DOMAIN: zam10115.zam.kfa-juelich.de
   METADATA_URL: https://zam10045.zam.kfa-juelich.de:7000/oauth2/.well-known/openid-configuration
   TESTING_OAUTH_ID: ff3f5a29-d210-4be2-a6d4-93c4fc755bfe
+  PRODCUTION_OAUTH_ID: affcd446-cab1-4751-8d76-e792f830d415
 
 
 # before script copied from gitlab docs
@@ -157,7 +158,7 @@ full-deploy-production:
     - until ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP ls /finished_cloudinit >/dev/null 2>&1; do sleep 30; done # wait until cloudinit script is complete
     - ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "sudo mkdir -p /persistent_data && sudo mount /dev/vdb1 /persistent_data"
     - ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "sudo service docker restart" # to use the configured docker data path
-    - ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $PRODUCTION_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS $AIRFLOW_FERNET_KEY $DAG_GIT_URL $SSO_CLIENT_SECRET"
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $PRODUCTION_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS $AIRFLOW_FERNET_KEY $DAG_GIT_URL $PRODUCTION_OAUTH_ID $SSO_CLIENT_SECRET $METADATA_URL"
     - echo "Done"
 
 # NOTE Light deployment did not perform well when the template/main.html file was changed (in case of the official airflow image being updated)
@@ -170,7 +171,7 @@ light-deploy-production:
   environment: Production
   script:
     - ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "cd /home/airflow/data-logistics-service && git stash && git stash clear && git checkout main && git checkout -f $CI_COMMIT_TAG && rm -rf dags && git clone https://github.com/eflows4hpc/dls-dags.git dags"
-    - ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $PRODUCTION_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS $AIRFLOW_FERNET_KEY $DAG_GIT_URL $SSO_CLIENT_SECRET"
+    - ssh -oStrictHostKeyChecking=accept-new airflow@$PRODUCTION_IP "sudo /home/airflow/data-logistics-service/scripts/deployment.sh /home/airflow /home/airflow/data-logistics-service $PRODUCTION_DOMAIN $AIRFLOW__SECRETS__BACKEND $AIRFLOW__SECRETS__BACKEND_KWARGS $AIRFLOW_FERNET_KEY $DAG_GIT_URL $PRODUCTION_OAUTH_ID $SSO_CLIENT_SECRET $METADATA_URL"
 
 test-production-webserver:
   cache: {}
