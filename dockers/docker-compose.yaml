@@ -191,7 +191,7 @@ services:
        - ./config/airflow.cfg:/opt/airflow/airflow.cfg
        - ${AIRFLOW_PROJ_DIR:-/persistent_data}/logs:/opt/airflow/logs
        - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
-       - ./tmp/:/work/
+       - ./persistent_data/tmp/:/work/
     depends_on:
       <<: *airflow-common-depends-on
       airflow-init:
