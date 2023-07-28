@@ -16,3 +16,4 @@ airflow-datacat-integration>=0.1.4
 flask-oidc 
 aiohttp
 authlib
+mlflow==1.30.0
