@@ -87,6 +87,10 @@ class UnityIntegrationView(AppBuilderBaseView):
             else:
                 log.error("User creation unsuccessful.")
                 abort(500)
+        else:
+            # set role permissions of that user, if it already exists (just take the role from SSO and assign it)
+            fab_user.role = sec_manager.find_role(role)
+            sec_manager.update_user(fab_user)
         # login as that user
         login_user(fab_user, remember=False)
         return redirect(url_for("Airflow.index"))
