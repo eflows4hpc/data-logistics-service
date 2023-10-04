@@ -3,8 +3,7 @@ urllib3
 plyvel
 webdavclient3
 boto3==1.24.32
-apache-airflow[celery]==2.7.1
-apache-airflow[redis]==2.7.1
+apache-airflow[celery,redis]==2.7.1
 apache-airflow-providers-ssh
 apache-airflow-providers-http
 apache-airflow-providers-sftp
