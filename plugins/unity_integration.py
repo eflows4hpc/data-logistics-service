@@ -25,6 +25,14 @@ oauth.register(
 unity = Blueprint('unity', __name__, url_prefix="/unity")
 
 class UnityIntegrationView(AppBuilderBaseView):
+    '''
+    This adds the neccessary routes for a oauth2 login support in addition to the basic_auth provided by airflow.
+    This is achieved by handling the oauth2 flow fully via the added routes nad using the basic_auth via internal functions.
+    Once a user has been authenticated, a matching user (via username or email) is either found or created in the airflow basic_auth database.
+
+    This means that the Oauth2 provider needs to be trusted to the same extent that the local user db is trusted.
+    This can also break on airflow updates without notice, as airflow-internal security functions are used, that are not well-documented and appear to not be intended for this use.
+    '''
 
     @unity.route('/')
     @unity.route('/login')
@@ -87,6 +95,10 @@ class UnityIntegrationView(AppBuilderBaseView):
             else:
                 log.error("User creation unsuccessful.")
                 abort(500)
+        else:
+            # set role permissions of that user, if it already exists (just take the role from SSO and assign it)
+            fab_user.role = sec_manager.find_role(role)
+            sec_manager.update_user(fab_user)
         # login as that user
         login_user(fab_user, remember=False)
         return redirect(url_for("Airflow.index"))
