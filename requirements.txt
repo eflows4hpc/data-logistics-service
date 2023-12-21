@@ -16,3 +16,5 @@ flask-oidc
 aiohttp
 authlib
 mlflow==1.30.0
+python-gitlab==3.15.0
+virtualenv
